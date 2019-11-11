@@ -18,13 +18,19 @@
 	<arg name="model" value="$(find ardupilot_gazebo)/models/bebop/urdf/bebop.urdf.xacro" />
   <arg name="brick_green" value="$(find ardupilot_gazebo)/models/bebop/urdf/brick_green.urdf"/>
   <arg name="brick_red" value="$(find ardupilot_gazebo)/models/bebop/urdf/brick_red.urdf"/>
+  <arg name="building" value="$(find potential_fields)/urdf/building.urdf.xacro"/>
 
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <include file="$(find potential_fields)/launch/empty_world.launch">
+	 	<arg name="world_name" value="$(find potential_fields)/worlds/test_exploration.world"/>
         <arg name="paused" value="false" />
         <arg name="use_sim_time" value="true"/>
         <arg name="verbose" value="true" />
     </include>
 
+	<include file="$(find potential_fields)/launch/building.launch">		
+		<arg name="x" value="20"/>
+		<arg name="y" value="2"/>
+    </include>
 	<!-- send the robot XML to param server -->
 	<param name="robot_description" command="
 	  $(find xacro)/xacro --inorder $(arg model)
@@ -53,14 +59,14 @@
 	 respawn="false" output="screen" >
 	</node>
 
-  <node name="spawn_brick" pkg="gazebo_ros" type="spawn_model"
-        args="-file $(arg brick_red) -urdf -x 3 -z 0.2 -model brick_red"
+  <!--node name="spawn_brick" pkg="gazebo_ros" type="spawn_model"
+        args="-file $(arg brick_red) -urdf -x 50 -y 0 -z 0.2 -model brick_red"
         respawn="false" output="screen"
   />
 	
 	<node name="camera_transform" pkg="tf" 
 		type="static_transform_publisher" 
-		args="0.111 0 0.0217 0 1.57 0 $(arg name)/base_link $(arg name)/camera 100" />
+		args="0.111 0 0.0217 0 1.57 0 $(arg name)/base_link $(arg name)/camera 100" /-->
 		
 	<group if="$(arg enable_velodyne)">
     
@@ -68,7 +74,14 @@
         <!-- <node 
             name="velodyne_transform" pkg="tf" 
             type="static_transform_publisher" 
-            args="0.1 0 0.15 0. 0.1323284641020683 3.141592653589793 $(arg name)/base_link $(arg name)/leddar 100" /> -->
+            args="0.1 0 0.15 0. 0.1323284641020683 3.141592653589793 $(arg name)/base_link $(arg name)/leddar 100" >
+		</node>
+
+		 <node 
+            name="imu_transform" pkg="tf" 
+            type="static_transform_publisher" 
+            args="0. 0 0. 0. 0. 0. $(arg name)/base_link imu_link 100" >
+		</node> -->
     </group>
     
 </launch>
