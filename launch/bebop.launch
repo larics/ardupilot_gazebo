@@ -18,19 +18,7 @@
 	<arg name="model" value="$(find ardupilot_gazebo)/models/bebop/urdf/bebop.urdf.xacro" />
   <arg name="brick_green" value="$(find ardupilot_gazebo)/models/bebop/urdf/brick_green.urdf"/>
   <arg name="brick_red" value="$(find ardupilot_gazebo)/models/bebop/urdf/brick_red.urdf"/>
-  <arg name="building" value="$(find potential_fields)/urdf/building.urdf.xacro"/>
-
-    <include file="$(find potential_fields)/launch/empty_world.launch">
-	 	<arg name="world_name" value="$(find potential_fields)/worlds/test_exploration.world"/>
-        <arg name="paused" value="false" />
-        <arg name="use_sim_time" value="true"/>
-        <arg name="verbose" value="true" />
-    </include>
-
-	<include file="$(find potential_fields)/launch/building.launch">		
-		<arg name="x" value="20"/>
-		<arg name="y" value="2"/>
-    </include>
+ 
 	<!-- send the robot XML to param server -->
 	<param name="robot_description" command="
 	  $(find xacro)/xacro --inorder $(arg model)
