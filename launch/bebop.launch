@@ -16,6 +16,7 @@
 	<arg name="wind_direction_z" default="0.0"/>
 	<arg name="enable_ground_truth" default="true"/>
 	<arg name="enable_velodyne" default="true" />
+	<arg name="enable_magnet" default="true" />
 	<arg name="model" value="$(find ardupilot_gazebo)/models/bebop/urdf/bebop.urdf.xacro" />
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -37,6 +38,7 @@
 	  wind_direction_y:=$(arg wind_direction_y)
 	  wind_direction_z:=$(arg wind_direction_z)
 	  enable_velodyne:=$(arg enable_velodyne)
+		enable_magnet:=$(arg enable_magnet)
 	  "
 	/>
 

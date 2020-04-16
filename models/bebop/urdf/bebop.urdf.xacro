@@ -2,6 +2,7 @@
 
 <robot name="bebop" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:property name="enable_velodyne" value="$(arg enable_velodyne)"/>
+	<xacro:property name="enable_magnet" value="$(arg enable_magnet)"/>
   <xacro:property name="namespace" value="$(arg namespace)" />
   <xacro:property name="wind_force" value="$(arg wind_force)" />
   <xacro:property name="wind_start" value="$(arg wind_start)" />
@@ -147,6 +148,7 @@
     </xacro:if>
 
 	<!--elektromagnet-->
+	<xacro:if value="${enable_magnet}">
 	<joint name="electromagnet_joint" type="fixed">
 		<axis xyz="0 1 0" />
 		<origin xyz="0.0 0.0 -0.075" rpy="0 0 0"/>
@@ -184,6 +186,7 @@
 			<gain>1</gain>
 		</plugin>
 	</gazebo>
+  </xacro:if>
 
 </robot>
 
