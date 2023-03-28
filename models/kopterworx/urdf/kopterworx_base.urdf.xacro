@@ -18,6 +18,7 @@
   <xacro:property name="rotor_x_offset" value="${arm_length*cos45}" /> <!-- [m] -->
   <xacro:property name="rotor_y_offset" value="${arm_length*sin45}" /> <!-- [m] -->
   <xacro:property name="rotor_offset_top" value="0.115" /> <!-- [m] -->
+  <xacro:property name="arm_offset_z" value="-0.0457" /> <!-- [m] -->
 
   <!-- Rotor constants -->
   <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->
@@ -42,7 +43,8 @@
   
   <!-- Included URDF Files -->
   <xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_base.urdf.xacro" />
-
+  <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/wp_manipulator.base.urdf.xacro" />
+  
   <!-- Instantiate multirotor_base_macro once -->
   <xacro:multirotor_base_macro
     robot_namespace="$(arg namespace)"
@@ -54,6 +56,8 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <xacro:insert_block name="body_inertia" />
   </xacro:multirotor_base_macro>
+
+  
 
   <!-- Instantiate rotors -->
   <xacro:vertical_rotor

@@ -5,13 +5,19 @@
   <xacro:property name="namespace" value="$(arg namespace)" />
   <xacro:property name="enable_velodyne" value="$(arg enable_velodyne)"/>
   <xacro:property name="enable_magnet" value="$(arg enable_magnet)"/>
-	<xacro:property name="enable_rotating_velodyne" value="$(arg enable_rotating_velodyne)" />
-	<xacro:property name="fdm_port_in" value="$(arg fdm_port_in)"/>
-	<xacro:property name="fdm_port_out" value="$(arg fdm_port_out)"/>
-	<xacro:property name="max_range" value="$(arg max_range)"/>
-	<xacro:property name="laser_count" value="$(arg laser_count)"/>
+  <xacro:property name="enable_manipulator" value="$(arg enable_manipulator)"/>
+  <xacro:property name="enable_rotating_velodyne" value="$(arg enable_rotating_velodyne)" />
+  <xacro:property name="fdm_port_in" value="$(arg fdm_port_in)"/>
+  <xacro:property name="fdm_port_out" value="$(arg fdm_port_out)"/>
+  <xacro:property name="max_range" value="$(arg max_range)"/>
+  <xacro:property name="laser_count" value="$(arg laser_count)"/>
+
+  <!-- Instantiate kopterworx mechanics "mechanics" -->
+  <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
+  <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
 	
-	<gazebo>
+	
+  <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/$(arg namespace)</robotNamespace>
       <robotParam>/$(arg namespace)/robot_description </robotParam>
@@ -41,10 +47,7 @@
     ixy="0.0" ixz="0.0" iyz="0.0" />
   </xacro:property>
 
-  <!-- Instantiate kopterworx mechanics "mechanics" -->
-	<xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
-  <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
-	
+
   <!-- Ardupilot plugin 
     NOTE: thrust_multiplier 
       Value is tuned in order for mavros/setpoint_raw/attitude/thrust to reflect real-world behavior. 
@@ -110,6 +113,17 @@
 		</xacro:unless>
 
 	</xacro:if>
+
+	<xacro:if value="${enable_manipulator}">
+	<!-- Instantiate aerial manipulator -->
+		<xacro:aerial_manipulator 
+			name="$(arg namespace)/wp_manipulator"
+			gazebo="true"
+			parent="$(arg namespace)/base_link">
+			<origin xyz="0 0 ${arm_offset_z}" rpy="-${pi/2} 0 0"/>
+		</xacro:aerial_manipulator>
+	</xacro:if>
+
 
 	<!-- Realistic odometry sensor with noise -->
 	<xacro:odometry_plugin_macro

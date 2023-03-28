@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<robot name="wp_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find ardupilot_gazebo)/manipultor/urdf/manipulator_base.urdf.xacro" />
+
+    <!-- When I set this to world, manipulator is fixed --> 
+    <xacro:arg name="parent" default="base_link"/>
+    <xacro:arg name="gazebo" default="true" />
+
+    <link name="world"></link>
+
+    <xacro:wp_manipulator
+        parent="world">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:wp_manipulator>
+    
+    <!-- Joint transmissions -->  
+    <xacro:joint_transmission
+        trans_number="1"
+        joint_name="joint1">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="2"
+        joint_name="joint2">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="3"
+        joint_name="joint3">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="4"
+        joint_name="joint4">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="5"
+        joint_name="joint5">
+    </xacro:joint_transmission>
+
+    <!-- Add gazebo control -->
+    <!-- TODO: Check different namespace --> 
+    <!--xacro:if value="$(arg gazebo)">
+      <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/uav</robotNamespace>
+        </plugin>
+      </gazebo>
+    </xacro:if-->
+
+  
+</robot>

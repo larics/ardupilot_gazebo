@@ -23,6 +23,9 @@
   <!-- Magnet properties - requires storm_gazebo_ros_magnet-->
   <arg name="enable_magnet"   default="false" />
 
+  <!-- Robot manipulator properties -->
+  <arg name="enable_manipulator" default="true" />
+
   <include file="$(find ardupilot_gazebo)/launch/empty_world.launch">
     <arg name="paused"          value="false" />
     <arg name="use_sim_time"    value="$(arg use_sim_time)"/>
@@ -38,7 +41,8 @@
 		namespace:=$(arg name)
 		enable_velodyne:=$(arg enable_velodyne)
 		enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
-    enable_magnet:=$(arg enable_magnet)
+        enable_magnet:=$(arg enable_magnet)
+		enable_manipulator:=$(arg enable_manipulator)
 		fdm_port_in:=$(arg fdm_port_in)
 		fdm_port_out:=$(arg fdm_port_out)
 		max_range:=$(arg max_range)
@@ -61,10 +65,24 @@
 	</node>
 
   <!-- Start the rotating velodyne controller -->
-	<group if="$(arg enable_rotating_velodyne)">
+  <group if="$(arg enable_rotating_velodyne)">
     <include file="$(find velodyne_gazebo_plugins)/launch/velodyne_controller.launch">
 			<arg name="namespace" value="$(env UAV_NAMESPACE)"/>
 		</include>
+  </group>
+
+  <group if="$(arg enable_manipulator)">
+
+	
+  <!-- Arm controller -->
+    <rosparam file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
+
+    <node ns="$(arg name)/wp_manipulator" name="controller_spawner" pkg="controller_manager" type="controller_manager"
+      args="spawn joint_state_controller joint1_position_controller joint2_position_controller
+            joint3_position_controller joint4_position_controller joint5_position_controller" 
+      respawn="false" output="screen">
+    </node>
+  
   </group>
 
 </launch>

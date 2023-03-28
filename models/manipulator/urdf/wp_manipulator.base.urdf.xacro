@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<robot name="wp_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="aerial_manipulator" params="name parent gazebo *origin">
+
+    <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/manipulator_base.urdf.xacro" />
+
+    <xacro:wp_manipulator
+      parent="${parent}">
+      <xacro:insert_block name="origin" />
+    </xacro:wp_manipulator>
+     
+    <!-- Joint transmissions -->  
+    <xacro:joint_transmission
+        trans_number="1"
+        joint_name="${name}/joint1">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="2"
+        joint_name="${name}/joint2">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="3"
+        joint_name="${name}/joint3">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="4"
+        joint_name="${name}/joint4">
+    </xacro:joint_transmission>
+
+    <xacro:joint_transmission
+        trans_number="5"
+        joint_name="${name}/joint5">
+    </xacro:joint_transmission>
+
+    <!--xacro:if value="${gazebo}">
+      <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/wp_manipulator</robotNamespace>
+        </plugin>
+      </gazebo>
+    </xacro:if-->
+
+  </xacro:macro>
+
+  
+
+</robot>
