@@ -158,7 +158,7 @@
       <xacro:insert_block name="origin"/>
     </joint>
 
-    <joint name="${name}/joint1" type="revolute">
+    <joint name="joint1" type="revolute">
       <parent link="base"/>
       <child link="link1"/>
       <!-- Adjust Gazebo coordinate system to link1 coordinate system -->
@@ -167,7 +167,7 @@
       <axis xyz="0 0 1" />
     </joint>
 
-    <joint name="${name}/joint2" type="revolute">
+    <joint name="joint2" type="revolute">
       <parent link="link1"/>
       <child link="link2"/>
       <origin xyz="0 ${a1} 0" rpy="0 0 ${theta1}"/>
@@ -175,7 +175,7 @@
       <axis xyz="0 0 1" />
     </joint>
 
-    <joint name="${name}/joint3" type="revolute">
+    <joint name="joint3" type="revolute">
       <parent link="link2"/>
       <child link="link3"/>
       <origin xyz="${a2} 0 0" rpy="${alpha2} 0 0"/>
@@ -183,7 +183,7 @@
       <axis xyz="0 0 1" />
     </joint>
 
-    <joint name="${name}/joint4" type="revolute">
+    <joint name="joint4" type="revolute">
       <parent link="link3"/>
       <child link="link4"/>
       <origin xyz="${a3} 0 0" rpy="0 0 0"/>
@@ -191,7 +191,7 @@
       <axis xyz="0 0 1" />
     </joint>
 
-    <joint name="${name}/joint5" type="revolute">
+    <joint name="joint5" type="revolute">
       <parent link="link4"/>
       <child link="link5"/>
       <origin xyz="${a4} 0 0" rpy="0 0 0"/>

@@ -1,26 +1,28 @@
-red: 
-  wp_manipulator:
-    joint1_position_controller:
-      #type: effort_controllers/JointPositionController
-      type: position_controllers/JointPositionController
-      joint: "red/wp_manipulator/joint1"
+joint_names: [joint1, joint2, joint3, joint4, joint5] 
+joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+joint1_position_controller:
+  #type: effort_controllers/JointPositionController
+  type: position_controllers/JointPositionController
+  joint: "joint1"
 
-    joint2_position_controller:
-      #type: effort_controllers/JointPositionController
-      type: position_controllers/JointPositionController
-      joint: "red/wp_manipulator/joint2"
+joint2_position_controller:
+  #type: effort_controllers/JointPositionController
+  type: position_controllers/JointPositionController
+  joint: "joint2"
 
-    joint3_position_controller:
-      #type: effort_controllers/JointPositionController
-      type: position_controllers/JointPositionController
-      joint: "red/wp_manipulator/joint3"
+joint3_position_controller:
+  #type: effort_controllers/JointPositionController
+  type: position_controllers/JointPositionController
+  joint: "joint3"
 
-    joint4_position_controller:
-      #type: effort_controllers/JointPositionController
-      type: position_controllers/JointPositionController
-      joint: "red/wp_manipulator/joint4"
+joint4_position_controller:
+  #type: effort_controllers/JointPositionController
+  type: position_controllers/JointPositionController
+  joint: "joint4"
 
-    joint5_position_controller:
-      type: position_controllers/JointPositionController
-      joint: "red/wp_manipulator/joint5"
+joint5_position_controller:
+  type: position_controllers/JointPositionController
+  joint: "joint5"
 

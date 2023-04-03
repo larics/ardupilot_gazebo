@@ -72,13 +72,12 @@
   </group>
 
   <group if="$(arg enable_manipulator)">
-
 	
   <!-- Arm controller -->
-    <rosparam file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
+    <rosparam ns="/red/wp_manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
 
-    <node ns="$(arg name)/wp_manipulator" name="controller_spawner" pkg="controller_manager" type="controller_manager"
-      args="spawn joint_state_controller joint1_position_controller joint2_position_controller
+    <node ns = "/red/wp_manipulator" name="controller_spawner" pkg="controller_manager" type="spawner"
+      args="joint_state_controller joint1_position_controller joint2_position_controller
             joint3_position_controller joint4_position_controller joint5_position_controller" 
       respawn="false" output="screen">
     </node>

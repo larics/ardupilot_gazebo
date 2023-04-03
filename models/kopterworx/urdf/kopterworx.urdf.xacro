@@ -115,6 +115,11 @@
 	</xacro:if>
 
 	<xacro:if value="${enable_manipulator}">
+
+	<!-- Included URDF Files -->
+  	<xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_base.urdf.xacro" />
+  	<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/wp_manipulator.base.urdf.xacro" />
+
 	<!-- Instantiate aerial manipulator -->
 		<xacro:aerial_manipulator 
 			name="$(arg namespace)/wp_manipulator"
