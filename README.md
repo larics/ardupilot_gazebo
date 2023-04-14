@@ -9,6 +9,7 @@
 * Ubuntu 18.04 LTS (Bionic Beaver)
 * ROS Melodic
 * Gazebo 9
+* Zavrsni
 
 ## Installation
 
