@@ -10,6 +10,7 @@
 * ROS Melodic
 * Gazebo 9
 * Zavrsni
+* Testiranje Gita i random implementacija izmjena
 
 ## Installation
 
