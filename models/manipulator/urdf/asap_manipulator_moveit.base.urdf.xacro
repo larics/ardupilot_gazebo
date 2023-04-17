@@ -37,6 +37,23 @@
   </xacro:joint_position_transmission>
 
   <xacro:if value="${gazebo}">
+
+    <gazebo reference="joint1">
+      <dynamics damping="5.0"/>
+    </gazebo>
+
+    <gazebo reference="joint2">
+      <dynamics damping="5.0"/>
+    </gazebo>
+
+    <gazebo reference="joint3">
+      <dynamics damping="5.0"/>
+    </gazebo>
+
+    <gazebo reference="joint4">
+      <dynamics damping="5.0"/>
+    </gazebo>
+
     <gazebo>
       <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       </plugin>
