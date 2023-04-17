@@ -946,7 +946,21 @@ manipulator
   </xacro:macro>
 
   <!-- We add a <transmission> block for every joint that we wish to actuate. -->
-  <xacro:macro name="joint_transmission" params="trans_number joint_name">
+  <xacro:macro name="joint_velocity_transmission" params="trans_number joint_name">
+    <transmission name="transmission_${trans_number}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${joint_name}">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="motor_${trans_number}">
+        <hardwareInterface>hardware_interface/VelocityActuatorInterface</hardwareInterface>
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+    <!-- We add a <transmission> block for every joint that we wish to actuate. -->
+  <xacro:macro name="joint_position_transmission" params="trans_number joint_name">
     <transmission name="transmission_${trans_number}">
       <type>transmission_interface/SimpleTransmission</type>
       <joint name="${joint_name}">

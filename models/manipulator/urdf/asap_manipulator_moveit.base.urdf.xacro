@@ -6,6 +6,16 @@
 
     <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/manipulator_asap_base.urdf.xacro" />
 
+    <xacro:arg name="parent" default="base_link"/>
+    <xacro:arg name="gazebo" default="true" />
+
+    <link name="world"></link>
+
+    <xacro:manipulator
+        parent="world">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </xacro:manipulator>
+
     <xacro:manipulator
       parent="${parent}">
       <xacro:insert_block name="origin" />
