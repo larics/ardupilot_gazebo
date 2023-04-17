@@ -93,6 +93,8 @@
 		respawn="false" output="screen">
 	</node>
 
+	<!--include file="$(find aerial_manipulators_control)/launch/asap_manipulator_4r_reversed_control.launch"/-->
+
   </group>
 
 </launch>

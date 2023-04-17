@@ -6,10 +6,10 @@
 
     <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/manipulator_asap_base.urdf.xacro" />
 
-    <xacro:manipulator
+    <xacro:manipulator_test
       parent="${parent}">
       <xacro:insert_block name="origin" />
-    </xacro:manipulator>
+    </xacro:manipulator_test>
      
     <!-- Joint transmissions -->  
     <xacro:joint_velocity_transmission
