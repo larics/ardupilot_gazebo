@@ -6,6 +6,7 @@
   <xacro:property name="enable_velodyne" value="$(arg enable_velodyne)"/>
   <xacro:property name="enable_magnet" value="$(arg enable_magnet)"/>
   <xacro:property name="enable_manipulator" value="$(arg enable_manipulator)"/>
+  <xacro:property name="enable_asap_manipulator" value="$(arg enable_asap_manipulator)"/>
   <xacro:property name="enable_rotating_velodyne" value="$(arg enable_rotating_velodyne)" />
   <xacro:property name="fdm_port_in" value="$(arg fdm_port_in)"/>
   <xacro:property name="fdm_port_out" value="$(arg fdm_port_out)"/>
@@ -13,10 +14,10 @@
   <xacro:property name="laser_count" value="$(arg laser_count)"/>
 
   <!-- Instantiate kopterworx mechanics "mechanics" -->
-  <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
   <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
-	
-	
+  <xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_base.urdf.xacro" />
+  <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
+		
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/$(arg namespace)</robotNamespace>
@@ -117,7 +118,6 @@
 	<xacro:if value="${enable_manipulator}">
 
 	<!-- Included URDF Files -->
-  	<xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_base.urdf.xacro" />
   	<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/wp_manipulator.base.urdf.xacro" />
 
 	<!-- Instantiate aerial manipulator -->
@@ -127,6 +127,20 @@
 			parent="$(arg namespace)/base_link">
 			<origin xyz="0 0 ${arm_offset_z}" rpy="-${pi/2} 0 0"/>
 		</xacro:aerial_manipulator>
+	</xacro:if>
+
+
+	<xacro:if value="${enable_asap_manipulator}">
+		<!-- Include URDF files -->
+		<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/asap_manipulator.base.urdf.xacro" />
+
+		<!-- Instantiate aerial manipulator -->
+		<xacro:manipulator
+			name="$(arg namespace)/manipulator"
+			gazebo="true"
+			parent="$(arg namespace)/base_link">
+			<origin xyz="0 0 ${arm_offset_z}" rpy="-${pi/2} 0 0"/>
+		</xacro:manipulator>
 	</xacro:if>
 
 

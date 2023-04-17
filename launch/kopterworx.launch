@@ -15,8 +15,8 @@
   <arg name="remap_gazebo_tf"     default="false"/>
 
   <!-- Velodyne properties - requires velodyne_simulator -->
-	<arg name="enable_velodyne"           default="false" />
-	<arg name="enable_rotating_velodyne"  default="false"/>
+  <arg name="enable_velodyne"           default="false" />
+  <arg name="enable_rotating_velodyne"  default="false"/>
   <arg name="laser_count"               default="16"/>
   <arg name="max_range"                 default="50"/>
 
@@ -24,7 +24,8 @@
   <arg name="enable_magnet"   default="false" />
 
   <!-- Robot manipulator properties -->
-  <arg name="enable_manipulator" default="true" />
+  <arg name="enable_manipulator" default="false" />
+  <arg name="enable_asap_manipulator" default="true" />
 
   <include file="$(find ardupilot_gazebo)/launch/empty_world.launch">
     <arg name="paused"          value="false" />
@@ -43,6 +44,7 @@
 		enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
         enable_magnet:=$(arg enable_magnet)
 		enable_manipulator:=$(arg enable_manipulator)
+		enable_asap_manipulator:=$(arg enable_asap_manipulator)
 		fdm_port_in:=$(arg fdm_port_in)
 		fdm_port_out:=$(arg fdm_port_out)
 		max_range:=$(arg max_range)
@@ -82,6 +84,17 @@
       respawn="false" output="screen">
     </node>
   
+  </group>
+
+  <group if="$(arg enable_asap_manipulator)">
+	<rosparam ns="/red/manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
+
+	<node ns="/red/manipulator" name="controller_spawner" pkg="controller_manager" type="spawner"
+		args="joint_state_controller joint1_position_controller joint2_position_controller 
+		  joint3_position_controller joint4_position_controller joint5_position_controller"
+		respawn="false" output="screen">
+	</node>
+
   </group>
 
 </launch>

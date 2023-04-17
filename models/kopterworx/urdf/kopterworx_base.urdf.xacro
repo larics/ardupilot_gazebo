@@ -40,10 +40,9 @@
   <xacro:property name="rotor_inertia">
     <xacro:box_inertia x="${radius_rotor}" y="0.015" z="0.003" mass="${mass_rotor*rotor_velocity_slowdown_sim}" />
   </xacro:property>
-  
-  <!-- Included URDF Files -->
-  <xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_base.urdf.xacro" />
-  <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/wp_manipulator.base.urdf.xacro" />
+
+  <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
+
   
   <!-- Instantiate multirotor_base_macro once -->
   <xacro:multirotor_base_macro
@@ -56,8 +55,6 @@
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <xacro:insert_block name="body_inertia" />
   </xacro:multirotor_base_macro>
-
-  
 
   <!-- Instantiate rotors -->
   <xacro:vertical_rotor
