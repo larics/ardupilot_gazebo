@@ -85,15 +85,31 @@
   </group>
 
   <group if="$(arg enable_asap_manipulator)">
-	<rosparam ns="/red/manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
+	<rosparam ns="/red_manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
 
-	<node ns="/red/manipulator" name="controller_spawner" pkg="controller_manager" type="spawner"
-		args="joint_state_controller joint1_position_controller joint2_position_controller 
-		  joint3_position_controller joint4_position_controller"
-		respawn="false" output="screen">
+	<!-- send the robot XML to param server -->
+	<param name="/robot_description" command="
+	  $(find xacro)/xacro --inorder $(arg model)
+		namespace:=$(arg name)
+		enable_velodyne:=$(arg enable_velodyne)
+		enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
+        enable_magnet:=$(arg enable_magnet)
+		enable_manipulator:=$(arg enable_manipulator)
+		enable_asap_manipulator:=$(arg enable_asap_manipulator)
+		fdm_port_in:=$(arg fdm_port_in)
+		fdm_port_out:=$(arg fdm_port_out)
+		max_range:=$(arg max_range)
+    	laser_count:=$(arg laser_count)
+	  "
+	/>
+
+	<!-- JoinTrajectoryController requires robot_description to be specified without namespace -->
+	<node ns="/red_manipulator" name="controller_spawner" pkg="controller_manager" type="spawner"
+		args="joint_state_controller arm_controller" respawn="false" output="screen">
 	</node>
 
 	<!--include file="$(find aerial_manipulators_control)/launch/asap_manipulator_4r_reversed_control.launch"/-->
+	<!-- joint1_position_controller joint2_position_controller  joint3_position_controller joint4_position_controller "-->
 
   </group>
 

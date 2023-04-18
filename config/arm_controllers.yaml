@@ -39,4 +39,17 @@ joint4_velocity_controller:
   type: velocity_controllers/JointVelocityController
   joint: "joint4"
 
+arm_controller:
+  type: position_controllers/JointTrajectoryController
+  joints: 
+    - joint1
+    - joint2
+    - joint3
+    - joint4
+
+  constrains: 
+    goal_time: 2.0 
+      
+  state_publish_rate: 50
+
 
