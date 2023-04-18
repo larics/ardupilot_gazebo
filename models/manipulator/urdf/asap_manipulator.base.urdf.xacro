@@ -12,25 +12,25 @@
     </xacro:manipulator_test>
      
     <!-- Joint transmissions -->  
-    <xacro:joint_velocity_transmission
+    <xacro:joint_position_transmission
         trans_number="1"
         joint_name="joint1">
-    </xacro:joint_velocity_transmission>
+    </xacro:joint_position_transmission>
     
-    <xacro:joint_velocity_transmission
+    <xacro:joint_position_transmission
         trans_number="2"
         joint_name="joint2">
-    </xacro:joint_velocity_transmission>
+    </xacro:joint_position_transmission>
 
-    <xacro:joint_velocity_transmission
+    <xacro:joint_position_transmission
         trans_number="3"
         joint_name="joint3">
-    </xacro:joint_velocity_transmission>
+    </xacro:joint_position_transmission>
 
-    <xacro:joint_velocity_transmission
+    <xacro:joint_position_transmission
         trans_number="4"
         joint_name="joint4">
-    </xacro:joint_velocity_transmission>
+    </xacro:joint_position_transmission>
 
     <xacro:if value="${gazebo}">
       <gazebo>
