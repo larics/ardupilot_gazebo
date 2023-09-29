@@ -74,10 +74,10 @@
       robot_namespace="$(arg namespace)"
       number="0"
       parent="$(arg namespace)/base_link"
-      mass="1.0"
+      mass="2.0"
       radius="0.05"
-      limit_low="-0.5"
-      limit_high="0.5"
+      limit_low="-1.5"
+      limit_high="1.5"
       color="Yellow">
       <origin xyz="0 0 -0.125" rpy="0 0 0" />
     </xacro:simple_manipulator>

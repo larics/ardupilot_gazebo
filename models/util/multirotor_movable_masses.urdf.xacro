@@ -11,17 +11,17 @@
       <axis xyz="1 0 0"/>
       <parent link="${parent}"/>
       <child link="${robot_namespace}/movable_mass_x_link_${number}"/>
-      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="1."/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="2000" velocity="2.5"/>
     </joint>
 
     <link name="${robot_namespace}/movable_mass_x_link_${number}">
       <inertial>
         <origin rpy="0 0 0" xyz="0 0 0"/>
-        <mass value="0.00001"/>
+        <mass value="0.01"/>
         <inertia
-            ixx="0.00001"     ixy="0.0"                                  ixz="0.0"
-            iyx="0.0"                                 iyy="0.00001"      iyz="0.0"
-            izx="0.0"                                 izy="0.0"                                  izz="0.00001" />
+            ixx="0.001"     ixy="0.0"                                  ixz="0.0"
+            iyx="0.0"                                 iyy="0.001"      iyz="0.0"
+            izx="0.0"                                 izy="0.0"                                  izz="0.001" />
       </inertial>
     </link>
 
@@ -30,17 +30,17 @@
       <axis xyz="0 1 0"/>
       <parent link="${robot_namespace}/movable_mass_x_link_${number}"/>
       <child link="${robot_namespace}/movable_mass_y_link_${number}"/>
-      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="1."/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="2000" velocity="2.5"/>
     </joint>
 
     <link name="${robot_namespace}/movable_mass_y_link_${number}">
       <inertial>
         <origin rpy="0 0 0" xyz="0 0 0"/>
-        <mass value="0.00001"/>
+        <mass value="0.01"/>
         <inertia
-            ixx="0.00001"     ixy="0.0"                                  ixz="0.0"
-            iyx="0.0"                                 iyy="0.00001"      iyz="0.0"
-            izx="0.0"                                 izy="0.0"                                  izz="0.00001" />
+            ixx="0.001"     ixy="0.0"                                  ixz="0.0"
+            iyx="0.0"                                 iyy="0.001"      iyz="0.0"
+            izx="0.0"                                 izy="0.0"                                  izz="0.001" />
       </inertial>
     </link>
 
@@ -49,7 +49,7 @@
       <axis xyz="0 0 1"/>
       <parent link="${robot_namespace}/movable_mass_y_link_${number}"/>
       <child link="${robot_namespace}/movable_mass_link_${number}"/>
-      <limit lower="${limit_low}" upper="${limit_high}" effort="2000" velocity="1."/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="2000" velocity="2.5"/>
     </joint>
 
     <link name="${robot_namespace}/movable_mass_link_${number}">
