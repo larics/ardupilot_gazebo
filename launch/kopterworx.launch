@@ -14,6 +14,9 @@
   <arg name="gui"                 default="true"/>
   <arg name="remap_gazebo_tf"     default="false"/>
 
+  <!-- Camera properties -->
+  <arg name="camera_pose"         default="front_facing_camera"/>
+
   <!-- Velodyne properties - requires velodyne_simulator -->
   <arg name="enable_velodyne"           default="false" />
   <arg name="enable_rotating_velodyne"  default="false"/>
@@ -58,6 +61,9 @@
     <arg name="use_sim_time"        value="$(arg use_sim_time)"/>
     <arg name="gui"                 value="$(arg gui)"/>
     <arg name="remap_gazebo_tf"     value="$(arg remap_gazebo_tf)"/>
+
+    <!-- Camera properties -->
+    <arg name="camera_pose"         value="$(arg camera_pose)"/>
 
     <!-- Velodyne properties - requires velodyne_simulator -->
     <arg name="enable_velodyne"           value="$(arg enable_velodyne)" />

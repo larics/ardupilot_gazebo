@@ -13,6 +13,7 @@
   <xacro:property name="fdm_port_out" value="$(arg fdm_port_out)"/>
   <xacro:property name="max_range" value="$(arg max_range)"/>
   <xacro:property name="laser_count" value="$(arg laser_count)"/>
+  <xacro:property name="camera_pose" value="$(arg camera_pose)"/>
 
   <!-- Collision bitmask - By default collides with everything -->
   <xacro:arg name="collision_bitmask" default="-1" />
@@ -200,7 +201,15 @@
       camera_link="${camera_size}"
       camera_mass="${camera_mass}"
       parent="${namespace}/base_link">
-      <xacro:insert_block name="front_facing_camera"/>    
+
+      <xacro:if value="${camera_pose == 'front_facing_camera'}">
+        <xacro:insert_block name="front_facing_camera"/>    
+      </xacro:if>
+
+      <xacro:if value="${camera_pose == 'down_facing_camera'}">
+        <xacro:insert_block name="down_facing_camera"/>    
+      </xacro:if>
+
       <xacro:insert_block name="camera_inertia"/>
     </xacro:cam>
   </xacro:unless>
@@ -209,7 +218,14 @@
     <xacro:gimbal_macro 
       namespace="$(arg namespace)"
       parent="${namespace}/base_link">
-      <xacro:insert_block name="front_facing_camera"/>    
+      
+      <xacro:if value="${camera_pose == 'front_facing_camera'}">
+        <xacro:insert_block name="front_facing_camera"/>    
+      </xacro:if>
+
+      <xacro:if value="${camera_pose == 'down_facing_camera'}">
+        <xacro:insert_block name="down_facing_camera"/>    
+      </xacro:if>
     </xacro:gimbal_macro>
   </xacro:if>
 
