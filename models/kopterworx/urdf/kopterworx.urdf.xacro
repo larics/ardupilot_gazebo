@@ -5,35 +5,19 @@
   <xacro:property name="namespace" value="$(arg namespace)" />
   <xacro:property name="enable_velodyne" value="$(arg enable_velodyne)"/>
   <xacro:property name="enable_magnet" value="$(arg enable_magnet)"/>
-<<<<<<< HEAD
   <xacro:property name="enable_manipulator" value="$(arg enable_manipulator)"/>
   <xacro:property name="enable_asap_manipulator" value="$(arg enable_asap_manipulator)"/>
   <xacro:property name="enable_rotating_velodyne" value="$(arg enable_rotating_velodyne)" />
-=======
-  <xacro:property name="enable_gimbal" value="$(arg enable_gimbal)"/>
-  <xacro:property name="enable_rotating_velodyne" value="$(arg enable_rotating_velodyne)" />
-  <xacro:property name="enable_tilt_rotors" value="$(arg enable_tilt_rotors)"/>
-  <xacro:property name="enable_simple_manipulator" value="$(arg enable_simple_manipulator)"/>
->>>>>>> larics-master
   <xacro:property name="fdm_port_in" value="$(arg fdm_port_in)"/>
   <xacro:property name="fdm_port_out" value="$(arg fdm_port_out)"/>
   <xacro:property name="max_range" value="$(arg max_range)"/>
   <xacro:property name="laser_count" value="$(arg laser_count)"/>
-<<<<<<< HEAD
 
   <!-- Instantiate kopterworx mechanics "mechanics" -->
   <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
   <xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_base.urdf.xacro" />
   <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
 		
-=======
-  <xacro:property name="camera_pose" value="$(arg camera_pose)"/>
-
-  <!-- Collision bitmask - By default collides with everything -->
-  <xacro:arg name="collision_bitmask" default="-1" />
-  <xacro:property name="collision_bitmask" value="$(arg collision_bitmask)" />
-  
->>>>>>> larics-master
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
       <robotNamespace>/$(arg namespace)</robotNamespace>
@@ -42,20 +26,20 @@
     </plugin>
   </gazebo>
 
-  <xacro:property name="horizontal_velodyne_origin">
+	<xacro:property name="horizontal_velodyne_origin">
     <origin xyz="0.08 0. -0.1578" rpy="-3.141592653589793 0.1323284641020683 0." />
-  </xacro:property>
-  
-  <xacro:property name="front_facing_camera">
-    <origin xyz="0.2 0 0.05" rpy="0 0 0"/>
-  </xacro:property>
+	</xacro:property>
+	
+	<xacro:property name="front_facing_camera">
+		<origin xyz="0.2 0 0.05" rpy="0 0 0"/>
+	</xacro:property>
 
-  <xacro:property name="down_facing_camera">
-    <origin xyz="0 0.2 -0.3" rpy="-1.570796 1.570796 0"/>
-  </xacro:property>
+	<xacro:property name="down_facing_camera">
+	  <origin xyz="0 0.2 -0.3" rpy="-1.570796 1.570796 0"/>
+	</xacro:property>
 
   <xacro:property name="camera_mass" value="1e-5"/>
-  <xacro:property name="camera_size" value="0.05" />
+	<xacro:property name="camera_size" value="0.05" />
   <xacro:property name="camera_inertia">
     <inertia
     ixx="1e-12"
@@ -64,74 +48,23 @@
     ixy="0.0" ixz="0.0" iyz="0.0" />
   </xacro:property>
 
-<<<<<<< HEAD
 
-=======
-  <!-- Instantiate kopterworx mechanics "mechanics" -->
-
-  <!-- Setup regular quadrotor -->
-  <xacro:unless value="${enable_tilt_rotors}">
-    <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
-  </xacro:unless>
-
-  <!-- Setup tilt quadrotor -->
-  <xacro:if value="${enable_tilt_rotors}">
-    <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_tilt_base.urdf.xacro" />
-  </xacro:if>
-
-  <xacro:if value="${enable_simple_manipulator}">
-    <xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_movable_masses.urdf.xacro"/>
-
-    <!-- Instantiate manipulator center of mass -->
-    <xacro:simple_manipulator 
-      robot_namespace="$(arg namespace)"
-      number="0"
-      parent="$(arg namespace)/base_link"
-      mass="1.0"
-      radius="0.05"
-      limit_low="-0.5"
-      limit_high="0.5"
-      color="Yellow">
-      <origin xyz="0 0 -0.125" rpy="0 0 0" />
-    </xacro:simple_manipulator>
-
-    <!-- Instantiate manipulator center of mass transmission -->
-    <xacro:movable_mass_pos_transmission
-      number="0"
-      joint_name="red/movable_mass_x_joint_0">
-    </xacro:movable_mass_pos_transmission>
-
-    <xacro:movable_mass_pos_transmission
-      number="1"
-      joint_name="red/movable_mass_y_joint_0">
-    </xacro:movable_mass_pos_transmission>
-
-    <xacro:movable_mass_pos_transmission
-      number="2"
-      joint_name="red/movable_mass_z_joint_0">
-    </xacro:movable_mass_pos_transmission>
-
-  </xacro:if>
-
-  <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
-  
->>>>>>> larics-master
   <!-- Ardupilot plugin 
     NOTE: thrust_multiplier 
       Value is tuned in order for mavros/setpoint_raw/attitude/thrust to reflect real-world behavior. 
   -->
   <xacro:ardupilot
-    imu_topic="/${namespace}/imu"
-    control_topic="/${namespace}/gazebo/command/motor_speed"
-    imu_sensor_name="${namespace}::imu_link::imu_sensor"
-    rotor_0_joint="${namespace}::${namespace}/rotor_0_joint"
-    rotor_1_joint="${namespace}::${namespace}/rotor_1_joint"
-    rotor_2_joint="${namespace}::${namespace}/rotor_2_joint"
-    rotor_3_joint="${namespace}::${namespace}/rotor_3_joint"
-    thrust_multiplier="667"
-    fdm_port_in="${fdm_port_in}"
-    fdm_port_out="${fdm_port_out}">
-  </xacro:ardupilot>
+		imu_topic="/${namespace}/imu"
+		control_topic="/${namespace}/gazebo/command/motor_speed"
+		imu_sensor_name="${namespace}::imu_link::imu_sensor"
+		rotor_0_joint="${namespace}::${namespace}/rotor_0_joint"
+		rotor_1_joint="${namespace}::${namespace}/rotor_1_joint"
+		rotor_2_joint="${namespace}::${namespace}/rotor_2_joint"
+		rotor_3_joint="${namespace}::${namespace}/rotor_3_joint"
+		thrust_multiplier="600"
+		fdm_port_in="${fdm_port_in}"
+		fdm_port_out="${fdm_port_out}">
+	</xacro:ardupilot>
 
   <xacro:if value="${enable_magnet}">
     <xacro:magnet_plugin 
@@ -146,7 +79,6 @@
     </xacro:magnet_plugin>
   </xacro:if>
 
-<<<<<<< HEAD
 	<xacro:if value="${enable_velodyne}">
 
 		<xacro:if value="${enable_rotating_velodyne}">
@@ -180,37 +112,19 @@
 				<xacro:insert_block name="horizontal_velodyne_origin"/>
 			</xacro:lidar-x>
 		</xacro:unless>
-
 	</xacro:if>
 
 	<xacro:if value="${enable_manipulator}">
-
-	<!-- Included URDF Files -->
-  	<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/wp_manipulator.base.urdf.xacro" />
-
-	<!-- Instantiate aerial manipulator -->
-		<xacro:aerial_manipulator 
-			name="$(arg namespace)/wp_manipulator"
-			gazebo="true"
-			parent="$(arg namespace)/base_link">
-			<origin xyz="0 0 ${arm_offset_z}" rpy="-${pi/2} 0 0"/>
-		</xacro:aerial_manipulator>
-	</xacro:if>
-
-
-	<xacro:if value="${enable_asap_manipulator}">
 		<!-- Include URDF files -->
 		<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/asap_manipulator.base.urdf.xacro" />
-
 		<!-- Instantiate aerial manipulator -->
 		<xacro:manipulator
-			name="$(arg namespace)/manipulator"
+			namespace="$(arg namespace)"
 			gazebo="true"
 			parent="$(arg namespace)/base_link">
 			<origin xyz="0 0 ${arm_offset_z}" rpy="-${pi/2} 0 0"/>
 		</xacro:manipulator>
 	</xacro:if>
-
 
 	<!-- Realistic odometry sensor with noise -->
 	<xacro:odometry_plugin_macro
@@ -244,7 +158,6 @@
 	</xacro:odometry_plugin_macro>
 
 <!-- Choose one of the following (and comment out the other): fixed RGBD camera or gimbal with RGBD camera. -->	
-
   <xacro:cam
     namespace="$(arg namespace)"
     camera_link="${camera_size}"
@@ -254,112 +167,8 @@
     <xacro:insert_block name="camera_inertia"/>
   </xacro:cam>
 
-<!--   <xacro:gimbal_macro parent="base_link">
+<!--<xacro:gimbal_macro parent="base_link">
     <origin xyz="0.25 0 -0.1" rpy="0 0 0"/>
   </xacro:gimbal_macro> -->
 	
-=======
-  <xacro:if value="${enable_velodyne}">
-
-    <xacro:if value="${enable_rotating_velodyne}">
-      <xacro:include filename="$(find velodyne_description)/urdf/LiDAR-X-rotating.urdf.xacro"/>
-      <xacro:lidar-x
-        parent="${namespace}/base_link_inertia"
-        name="velodyne"
-        topic="${namespace}/velodyne_points"
-        hz="10"
-        samples="440"
-        gpu="false"
-        min_range="1" 
-        max_range="${max_range}" 
-        lasers="32">
-        <xacro:insert_block name="horizontal_velodyne_origin"/>
-      </xacro:lidar-x>
-    </xacro:if>
-
-    <xacro:unless value="${enable_rotating_velodyne}">
-      <xacro:include filename="$(find velodyne_description)/urdf/LiDAR-X.urdf.xacro"/>
-      <xacro:lidar-x
-        parent="${namespace}/base_link_inertia"
-        name="velodyne"
-        topic="${namespace}/velodyne_points" 
-        hz="10"
-        samples="440"
-        gpu="false"
-        min_range="1"
-        max_range="${max_range}"
-        lasers="32">
-        <xacro:insert_block name="horizontal_velodyne_origin"/>
-      </xacro:lidar-x>
-    </xacro:unless>
-
-  </xacro:if>
-
-  <!-- Realistic odometry sensor with noise -->
-  <xacro:odometry_plugin_macro
-    namespace="${namespace}"
-    odometry_sensor_suffix=""
-    parent_link="${namespace}/base_link"
-    pose_topic="pose"
-    pose_with_covariance_topic="pose_with_covariance"
-    position_topic="position"
-    transform_topic="transform"
-    odometry_topic="odometry"
-    parent_frame_id="world"
-    child_frame_id="${namespace}/base_link"
-    mass_odometry_sensor="0.01"
-    measurement_divisor="20"
-    measurement_delay="0"
-    unknown_delay="0.0"
-    noise_normal_position="0.0 0.0 0.0"
-    noise_normal_quaternion="0.0 0.0 0.0"
-    noise_normal_linear_velocity="0.0 0.0 0.0"
-    noise_normal_angular_velocity="0.0 0.0 0.0"
-    noise_uniform_position="0.0 0.0 0.0"
-    noise_uniform_quaternion="0.0 0.0 0.0"
-    noise_uniform_linear_velocity="0.0 0.0 0.0"
-    noise_uniform_angular_velocity="0.0 0.0 0.0"
-    enable_odometry_map="false"
-    odometry_map=""
-    image_scale="">
-    <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" /> <!-- [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] -->
-    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
-  </xacro:odometry_plugin_macro>
-
-  <!-- Choose one of the following (and comment out the other): fixed RGBD camera or gimbal with RGBD camera. -->	
-  <xacro:unless value="${enable_gimbal}">
-    <xacro:cam
-      namespace="$(arg namespace)"
-      camera_link="${camera_size}"
-      camera_mass="${camera_mass}"
-      parent="${namespace}/base_link">
-
-      <xacro:if value="${camera_pose == 'front_facing_camera'}">
-        <xacro:insert_block name="front_facing_camera"/>    
-      </xacro:if>
-
-      <xacro:if value="${camera_pose == 'down_facing_camera'}">
-        <xacro:insert_block name="down_facing_camera"/>    
-      </xacro:if>
-
-      <xacro:insert_block name="camera_inertia"/>
-    </xacro:cam>
-  </xacro:unless>
-
-  <xacro:if value="${enable_gimbal}">
-    <xacro:gimbal_macro 
-      namespace="$(arg namespace)"
-      parent="${namespace}/base_link">
-      
-      <xacro:if value="${camera_pose == 'front_facing_camera'}">
-        <xacro:insert_block name="front_facing_camera"/>    
-      </xacro:if>
-
-      <xacro:if value="${camera_pose == 'down_facing_camera'}">
-        <xacro:insert_block name="down_facing_camera"/>    
-      </xacro:if>
-    </xacro:gimbal_macro>
-  </xacro:if>
-
->>>>>>> larics-master
 </robot>

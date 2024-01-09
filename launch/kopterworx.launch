@@ -26,12 +26,6 @@
   <!-- Magnet properties - requires storm_gazebo_ros_magnet-->
   <arg name="enable_magnet"   default="false" />
 
-<<<<<<< HEAD
-  <!-- Robot manipulator properties -->
-  <arg name="enable_manipulator" default="false" />
-  <arg name="enable_asap_manipulator" default="true" />
-
-=======
   <!-- Gimbal properties -->
   <arg name="enable_gimbal"   default="false" />
 
@@ -41,9 +35,10 @@
   <!-- Actuators -->
   <arg name="enable_tilt_rotors"        default="false" />
   <arg name="enable_simple_manipulator" default="false" />
+  
+  <!-- Robot manipulator -->
+  <arg name="enable_manipulator" default="true" />
 
-  <!-- Spawn the world -->
->>>>>>> larics-master
   <include file="$(find ardupilot_gazebo)/launch/empty_world.launch">
     <arg name="paused"          value="false" />
     <arg name="use_sim_time"    value="$(arg use_sim_time)"/>
@@ -54,44 +49,7 @@
     <arg name="debug"           value="false" />
   </include>
 
-<<<<<<< HEAD
-  <!-- send the robot XML to param server -->
-	<param name="$(arg name)/robot_description" command="
-	  $(find xacro)/xacro --inorder $(arg model)
-		namespace:=$(arg name)
-		enable_velodyne:=$(arg enable_velodyne)
-		enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
-        enable_magnet:=$(arg enable_magnet)
-		enable_manipulator:=$(arg enable_manipulator)
-		enable_asap_manipulator:=$(arg enable_asap_manipulator)
-		fdm_port_in:=$(arg fdm_port_in)
-		fdm_port_out:=$(arg fdm_port_out)
-		max_range:=$(arg max_range)
-    laser_count:=$(arg laser_count)
-	  "
-	/>
-
-	<node name="robot_state_publisher" pkg="robot_state_publisher"
-    type="robot_state_publisher" ns="$(arg name)"/>
-	
-	<!-- push robot_description to factory and spawn robot in gazebo -->
-	<node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
-	 args="-param $(arg name)/robot_description
-	       -urdf
-	       -x $(arg x)
-	       -y $(arg y)
-	       -z $(arg z)
-	       -model $(arg name)"
-	 respawn="false" output="screen" >
-	</node>
-
-  <!-- Start the rotating velodyne controller -->
-  <group if="$(arg enable_rotating_velodyne)">
-    <include file="$(find velodyne_gazebo_plugins)/launch/velodyne_controller.launch">
-			<arg name="namespace" value="$(env UAV_NAMESPACE)"/>
-		</include>
-  </group>
-=======
+  <!-- spawn kopterworx -->
   <include file="$(find ardupilot_gazebo)/launch/spawn_kopterworx.launch">
     <arg name="name"                value="$(arg name)"/>
     <arg name="tf_prefix"           value="$(arg tf_prefix)"/>
@@ -129,47 +87,11 @@
     <arg name="enable_tilt_rotors"        default="$(arg enable_tilt_rotors)" />
     <arg name="enable_simple_manipulator" default="$(arg enable_simple_manipulator)" />
 
+    <!-- Enable manipulator -->
+    <arg name="enable_manipulator" default="$(arg enable_manipulator)" />
   </include>
->>>>>>> larics-master
 
-  <group if="$(arg enable_manipulator)">
-    <rosparam ns="/red/wp_manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
 
-    <node ns = "/red/wp_manipulator" name="controller_spawner" pkg="controller_manager" type="spawner"
-      args="joint_state_controller joint1_position_controller joint2_position_controller
-            joint3_position_controller joint4_position_controller joint5_position_controller" 
-      respawn="false" output="screen">
-    </node>
-  
-  </group>
 
-  <group if="$(arg enable_asap_manipulator)">
-	<rosparam ns="/red_manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
-
-	<!-- send the robot XML to param server -->
-	<param name="/robot_description" command="
-	  $(find xacro)/xacro --inorder $(arg model)
-		namespace:=$(arg name)
-		enable_velodyne:=$(arg enable_velodyne)
-		enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
-        enable_magnet:=$(arg enable_magnet)
-		enable_manipulator:=$(arg enable_manipulator)
-		enable_asap_manipulator:=$(arg enable_asap_manipulator)
-		fdm_port_in:=$(arg fdm_port_in)
-		fdm_port_out:=$(arg fdm_port_out)
-		max_range:=$(arg max_range)
-    	laser_count:=$(arg laser_count)
-	  "
-	/>
-
-	<!-- JoinTrajectoryController requires robot_description to be specified without namespace -->
-	<node ns="/red_manipulator" name="controller_spawner" pkg="controller_manager" type="spawner"
-		args="joint_state_controller arm_controller" respawn="false" output="screen">
-	</node>
-
-	<!--include file="$(find aerial_manipulators_control)/launch/asap_manipulator_4r_reversed_control.launch"/-->
-	<!-- joint1_position_controller joint2_position_controller  joint3_position_controller joint4_position_controller "-->
-
-  </group>
 
 </launch>

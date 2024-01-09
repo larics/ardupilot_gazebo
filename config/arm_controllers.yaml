@@ -1,5 +1,5 @@
 joint_names: [joint1, joint2, joint3, joint4] 
-joint_state_controller:
+arm_state_controller:
   type: joint_state_controller/JointStateController
   publish_rate: 50
 

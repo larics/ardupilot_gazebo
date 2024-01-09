@@ -36,6 +36,9 @@
   <arg name="enable_tilt_rotors"        default="false" />
   <arg name="enable_simple_manipulator" default="false" />
 
+  <!-- Manipulator -->
+  <arg name="enable_manipulator" default="false" />
+
   <!-- send the robot XML to param server -->
 	<param name="$(arg name)/robot_description" command="
 	  $(find xacro)/xacro --inorder $(arg model)
@@ -44,6 +47,7 @@
     enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
     enable_magnet:=$(arg enable_magnet)
     enable_gimbal:=$(arg enable_gimbal)
+    enable_manipulator:=$(arg enable_manipulator)
     fdm_port_in:=$(arg fdm_port_in)
     fdm_port_out:=$(arg fdm_port_out)
     max_range:=$(arg max_range)
@@ -107,5 +111,20 @@
         args="joint_tilt_state_controller 
               tilt_joints_position_controller"/>
   </group>
+
+  <!-- Enable robot manipulator-->
+  <group if="$(arg enable_manipulator)">
+    <rosparam ns="$(arg name)/manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
+	  <!-- JoinTrajectoryController requires robot_description to be specified without namespace -->
+	  <node ns="$(arg name)/manipulator" 
+        name="controller_spawner"
+        pkg="controller_manager"
+        type="spawner"
+        output="screen"
+        respawn="false"
+		    args="arm_state_controller
+              arm_controller"/>
+  </group>
+
 
 </launch>
