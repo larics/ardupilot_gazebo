@@ -114,7 +114,7 @@
 
   <!-- Enable robot manipulator-->
   <group if="$(arg enable_manipulator)">
-    <rosparam ns="$(arg name)/manipulator" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
+    <rosparam ns="$(arg name)" file="$(find ardupilot_gazebo)/config/arm_controllers.yaml"/>
 	  <!-- JoinTrajectoryController requires robot_description to be specified without namespace -->
 	  <node ns="$(arg name)/manipulator" 
         name="controller_spawner"
