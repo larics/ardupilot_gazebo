@@ -1,0 +1,70 @@
+<launch>
+
+  <arg name="name"                default="$(env UAV_NAMESPACE)"/>
+  <arg name="tf_prefix"           default="$(arg name)"/>
+  <arg name="x"                   default="0.0"/>
+  <arg name="y"                   default="0.0"/>
+  <arg name="z"                   default="0.5"/>
+  <arg name="enable_ground_truth" default="true"/>
+  <arg name="model_name"          default="kopterworx"/>
+  <arg name="model"               default="$(find ardupilot_gazebo)/models/$(arg model_name)/urdf/$(arg model_name).urdf.xacro" />
+  <arg name="world"               default="worlds/empty.world"/>
+  <arg name="fdm_port_in"         default="9002"/>
+  <arg name="fdm_port_out"        default="9003"/>
+  <arg name="use_sim_time"        default="true"/>
+  <arg name="gui"                 default="true"/>
+  <arg name="remap_gazebo_tf"     default="false"/>
+
+  <!-- Velodyne properties - requires velodyne_simulator -->
+  <arg name="enable_velodyne"           default="false" />
+  <arg name="enable_rotating_velodyne"  default="false"/>
+  <arg name="laser_count"               default="16"/>
+  <arg name="max_range"                 default="50"/>
+
+  <!-- Magnet properties - requires storm_gazebo_ros_magnet-->
+  <arg name="enable_magnet"   default="false" />
+
+  <!-- Gimbal properties -->
+  <arg name="enable_gimbal"   default="false" />
+
+  <!-- Collision bitmask - by default collide with everything -->
+  <arg name="collision_bitmask" default="-1" />
+
+  <!-- send the robot XML to param server -->
+	<param name="$(arg name)/robot_description" command="
+	  $(find xacro)/xacro --inorder $(arg model)
+    namespace:=$(arg name)
+    enable_velodyne:=$(arg enable_velodyne)
+    enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
+    enable_magnet:=$(arg enable_magnet)
+    enable_gimbal:=$(arg enable_gimbal)
+    fdm_port_in:=$(arg fdm_port_in)
+    fdm_port_out:=$(arg fdm_port_out)
+    max_range:=$(arg max_range)
+    laser_count:=$(arg laser_count)
+    collision_bitmask:=$(arg collision_bitmask)
+	  "
+	/>
+
+	<node name="robot_state_publisher" pkg="robot_state_publisher"
+    type="robot_state_publisher" ns="$(arg name)"/>
+	
+	<!-- push robot_description to factory and spawn robot in gazebo -->
+	<node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
+	 args="-param $(arg name)/robot_description
+	       -urdf
+	       -x $(arg x)
+	       -y $(arg y)
+	       -z $(arg z)
+	       -model $(arg name)"
+	 respawn="false" output="screen" >
+	</node>
+  
+  <!-- Start the rotating velodyne controller -->
+  <group if="$(arg enable_rotating_velodyne)">
+    <include file="$(find velodyne_gazebo_plugins)/launch/velodyne_controller.launch">
+      <arg name="namespace" value="$(env UAV_NAMESPACE)"/>
+    </include>
+  </group>
+
+</launch>

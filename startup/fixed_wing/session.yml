@@ -1,0 +1,21 @@
+name: single_zephyr
+root: ./
+startup_window: roscore
+pre_window: export UAV_NAMESPACE=red
+windows:
+  - roscore:
+      layout: tiled
+      panes:
+        - roscore
+        - export SITL_RITW_TERMINAL="tmux new-window -d -n:arduplane1"; waitForRos; 
+          roslaunch ardupilot_gazebo sim_vehicle.launch 
+          enable_console:=false
+          binary:=ArduPlane
+          frame:=gazebo-zephyr
+          name:=zephyr
+          parm_file:=$(rospack find ardupilot_gazebo)/config/zephyr.parm
+        - waitForRos; rosparam set use_sim_time true; roslaunch ardupilot_gazebo mavros.launch 
+  - gazebo:
+      layout: tiled
+      panes:
+        - waitForRos; roslaunch ardupilot_gazebo zephyr.launch use_sim_time:=true

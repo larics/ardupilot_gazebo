@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <!-- Macro for a simple 3D manipulator. -->
+  <xacro:macro name="simple_manipulator" 
+    params="robot_namespace number parent mass radius limit_low limit_high color *origin">
+
+    <joint name="${robot_namespace}/movable_mass_x_joint_${number}" type="prismatic">
+      <xacro:insert_block name="origin"/>
+      <axis xyz="1 0 0"/>
+      <parent link="${parent}"/>
+      <child link="${robot_namespace}/movable_mass_x_link_${number}"/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="1."/>
+    </joint>
+
+    <link name="${robot_namespace}/movable_mass_x_link_${number}">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="0.00001"/>
+        <inertia
+            ixx="0.00001"     ixy="0.0"                                  ixz="0.0"
+            iyx="0.0"                                 iyy="0.00001"      iyz="0.0"
+            izx="0.0"                                 izy="0.0"                                  izz="0.00001" />
+      </inertial>
+    </link>
+
+    <joint name="${robot_namespace}/movable_mass_y_joint_${number}" type="prismatic">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <parent link="${robot_namespace}/movable_mass_x_link_${number}"/>
+      <child link="${robot_namespace}/movable_mass_y_link_${number}"/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="1."/>
+    </joint>
+
+    <link name="${robot_namespace}/movable_mass_y_link_${number}">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="0.00001"/>
+        <inertia
+            ixx="0.00001"     ixy="0.0"                                  ixz="0.0"
+            iyx="0.0"                                 iyy="0.00001"      iyz="0.0"
+            izx="0.0"                                 izy="0.0"                                  izz="0.00001" />
+      </inertial>
+    </link>
+
+    <joint name="${robot_namespace}/movable_mass_z_joint_${number}" type="prismatic">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <parent link="${robot_namespace}/movable_mass_y_link_${number}"/>
+      <child link="${robot_namespace}/movable_mass_link_${number}"/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="2000" velocity="1."/>
+    </joint>
+
+    <link name="${robot_namespace}/movable_mass_link_${number}">
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <sphere radius="${radius}"/>
+        </geometry>
+      </visual>
+      
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+            ixx="${2/5 * mass * radius * radius}"     ixy="0.0"                                  ixz="0.0"
+            iyx="0.0"                                 iyy="${2/5 * mass * radius * radius}"      iyz="0.0"
+            izx="0.0"                                 izy="0.0"                                  izz="${2/5 * mass * radius * radius}" />
+      </inertial>
+    </link>
+
+    <gazebo reference="${robot_namespace}/movable_mass_link_${number}">
+      <material>Gazebo/${color}</material>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Macro for movable mass on a straight line. -->
+  <xacro:macro name="movable_mass_linear" 
+    params="robot_namespace number parent mass radius limit_low limit_high color x_axis y_axis z_axis *origin">
+
+    <joint name="${robot_namespace}/movable_mass_joint_${number}" type="prismatic">
+      <xacro:insert_block name="origin"/>
+      <axis xyz="${x_axis} ${y_axis} ${z_axis}"/>
+      <parent link="${parent}"/>
+      <child link="${robot_namespace}/movable_mass_link_${number}"/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="10000" velocity="20"/>
+    </joint>
+
+    <link name="${robot_namespace}/movable_mass_link_${number}">
+      <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+          <sphere radius="${radius}"/>
+        </geometry>
+      </visual>
+      
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="${mass}"/>
+        <inertia
+            ixx="${2/5 * mass * radius * radius}"     ixy="0.0"                                  ixz="0.0"
+            iyx="0.0"                                 iyy="${2/5 * mass * radius * radius}"      iyz="0.0"
+            izx="0.0"                                 izy="0.0"                                  izz="${2/5 * mass * radius * radius}" />
+      </inertial>
+    </link>
+
+    <gazebo reference="${robot_namespace}/movable_mass_link_${number}">
+      <material>Gazebo/${color}</material>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Movable mass position transmision -->
+  <xacro:macro name="movable_mass_pos_transmission" params="number joint_name">
+    <transmission name="movable_mass_pos_transmission_${number}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="movable_mass_motor_${number}">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="${joint_name}">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+  </xacro:macro>
+
+  <!-- Movable mass velocity transmision -->
+  <xacro:macro name="movable_mass_vel_transmission" params="number joint_name">
+    <transmission name="movable_mass_vel_transmission_${number}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="movable_mass_motor_${number}">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+      <joint name="${joint_name}">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+    </transmission>
+  </xacro:macro>
+
+</robot>

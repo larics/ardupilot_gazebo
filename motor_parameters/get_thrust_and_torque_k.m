@@ -1,7 +1,7 @@
 %% Get data
 clc
 clear all
-load 22x11e.mat
+load 22x8.mat
 thrust = lbf2N(thrust_lbf);
 torque = inlbf2Nm(torque_lbf);
 rads = rpm2rads(rpm);

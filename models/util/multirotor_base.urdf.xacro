@@ -20,12 +20,31 @@
   <!-- Main multirotor link -->
   <xacro:macro name="multirotor_base_macro"
     params="robot_namespace mass body_width body_height mesh_file mesh_scale *origin *inertia">
+    <gazebo reference="${robot_namespace}/base_link">
+      <collision>
+        <surface>
+          <contact>
+            <collide_bitmask>${collision_bitmask}</collide_bitmask>
+          </contact>
+        </surface>
+      </collision>
+    </gazebo>
     <link name="${robot_namespace}/base_link"></link>
     <joint name="base_joint" type="fixed">
       <xacro:insert_block name="origin"/>
       <parent link="${robot_namespace}/base_link" />
       <child link="${robot_namespace}/base_link_inertia" />
     </joint>
+
+    <gazebo reference="${robot_namespace}/base_link_inertia">
+      <collision>
+        <surface>
+          <contact>
+            <collide_bitmask>${collision_bitmask}</collide_bitmask>
+          </contact>
+        </surface>
+      </collision>
+    </gazebo>
     <link name="${robot_namespace}/base_link_inertia">
       <inertial>
         <mass value="${mass}" />  <!-- [kg] -->
@@ -35,8 +54,7 @@
 
       <visual>
         <geometry>
-          <mesh filename="package://${mesh_file}"
-            scale="${mesh_scale} ${mesh_scale} ${mesh_scale}" />
+          <mesh filename="package://${mesh_file}" scale="${mesh_scale} ${mesh_scale} ${mesh_scale}" />
           <!--box size="${body_width} ${body_width} ${body_height}"/--> <!-- [m] [m] [m] -->
         </geometry>
       </visual>
@@ -53,14 +71,20 @@
     <!-- IMU -->
     <link name="imu_link">
       <inertial>
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0"
-          izz="0.001" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
         <mass value="0.01" />  <!-- [kg] -->
         <origin xyz="0 0 0" rpy="0 0 0" />
       </inertial>
     </link>
 
     <gazebo reference="imu_link">
+      <collision>
+        <surface>
+          <contact>
+            <collide_bitmask>${collision_bitmask}</collide_bitmask>
+          </contact>
+        </surface>
+      </collision>
       <sensor name="imu_sensor" type="imu">
         <always_on>true</always_on>
         <update_rate>50</update_rate>
@@ -103,6 +127,7 @@
   <!-- Rotor joint and link -->
   <xacro:macro name="vertical_rotor"
     params="robot_namespace suffix direction motor_constant moment_constant parent mass_rotor radius_rotor time_constant_up time_constant_down max_rot_velocity motor_number rotor_drag_coefficient rolling_moment_coefficient color prop_scale *origin *inertia">
+    
     <joint name="${robot_namespace}/rotor_${motor_number}_joint" type="continuous">
       <xacro:insert_block name="origin" />
       <axis xyz="0 0 1" />
@@ -110,11 +135,19 @@
       <!-- <limit effort="2000" velocity="${max_rot_velocity}" /> -->
       <parent link="${parent}" />
       <child link="${robot_namespace}/rotor_${motor_number}" />
-
     </joint>
     <!-- TODO(ff): not currently set because it's not yet supported -->
     <!-- <gazebo reference="rotor_${motor_number}_joint"> <axis> <xyz>0 0 1</xyz> 
       <limit> <velocity> ${max_rot_velocity} </velocity> </limit> </axis> </gazebo> -->
+    <gazebo reference="${robot_namespace}/rotor_${motor_number}">
+      <collision>
+        <surface>
+          <contact>
+            <collide_bitmask>${collision_bitmask}</collide_bitmask>
+          </contact>
+        </surface>
+      </collision>
+    </gazebo>
     <link name="${robot_namespace}/rotor_${motor_number}">
       <inertial>
         <mass value="${mass_rotor}" /> <!-- [kg] -->
@@ -230,6 +263,15 @@
   <xacro:macro name="cam" params="namespace camera_link camera_mass parent *origin *inertia">
 
     <!-- Camera link -->
+    <gazebo reference="${namespace}/camera_box">
+      <collision>
+        <surface>
+          <contact>
+            <collide_bitmask>${collision_bitmask}</collide_bitmask>
+          </contact>
+        </surface>
+      </collision>
+    </gazebo>
     <link name="${namespace}/camera_box">
 
       <!--collision>
@@ -260,6 +302,15 @@
       <child link="${namespace}/camera_box"/>
     </joint>
 
+    <gazebo reference="${namespace}/camera">
+      <collision>
+        <surface>
+          <contact>
+            <collide_bitmask>${collision_bitmask}</collide_bitmask>
+          </contact>
+        </surface>
+      </collision>
+    </gazebo>
     <link name="${namespace}/camera"/>
 
     <joint name="camera_help" type="fixed">
@@ -337,55 +388,80 @@
     </transmission>
   </xacro:macro>
 
-  <xacro:macro name="gimbal_macro" params="parent *origin">
-        <joint name="gimbal_position" type="fixed">
+  <xacro:macro name="gimbal_macro" params="namespace parent *origin">
+    
+        <joint name="${namespace}/gimbal_position" type="fixed">
             <xacro:insert_block name="origin"/>
-            <parent link="base_link"/>
-            <child link="gimbal_link_1"/>
+            <parent link="${parent}"/>
+            <child link="${namespace}/gimbal_link_1"/>
         </joint>
-        <gazebo reference="gimbal_position">
+
+        <gazebo reference="${namespace}/gimbal_position">
             <preserveFixedJoint>true</preserveFixedJoint>
         </gazebo>
 
-        <link name="gimbal_link_1">
+        <gazebo reference="${namespace}/gimbal_link_1">
+          <collision>
+            <surface>
+              <contact>
+                <collide_bitmask>${collision_bitmask}</collide_bitmask>
+              </contact>
+            </surface>
+          </collision>
+        </gazebo>
+
+        <!-- yawing link -->
+        <link name="${namespace}/gimbal_link_1">
             <inertial>
                 <mass value="0.0001" />
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
             </inertial>
-<!--             <visual>
-                <geometry>
-                <box size="0.01 0.01 0.01" />
-                </geometry>
-            </visual> -->
         </link>
-        <joint name="gimbal_yaw_joint" type="continuous">
-            <parent link="gimbal_link_1" />
-            <child link="gimbal_link_2" />
+
+        <joint name="${namespace}/gimbal_yaw_joint" type="continuous">
+            <parent link="${namespace}/gimbal_link_1" />
+            <child link="${namespace}/gimbal_link_2" />
             <axis xyz="0 0 1" />
             <dynamics damping="0.0" friction="0.0" />
         </joint>
 
-        <link name="gimbal_link_2">
+        <gazebo reference="${namespace}/gimbal_link_2">
+          <collision>
+            <surface>
+              <contact>
+                <collide_bitmask>${collision_bitmask}</collide_bitmask>
+              </contact>
+            </surface>
+          </collision>
+        </gazebo>
+
+        <link name="${namespace}/gimbal_link_2">
             <inertial>
                 <mass value="0.0001" />
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
             </inertial>
-            <visual>
-                <geometry>
-                <box size="0.01 0.01 0.01" />
-                </geometry>
-            </visual>
         </link>
-        <joint name="gimbal_pitch_joint" type="continuous">
-            <parent link="gimbal_link_2" />
-            <child link="gimbal_link_3" />
+
+        <joint name="${namespace}/gimbal_pitch_joint" type="continuous">
+            <parent link="${namespace}/gimbal_link_2" />
+            <child link="${namespace}/gimbal_link_3" />
             <axis xyz="0 1 0" />
             <dynamics damping="0.0" friction="0.0" />
         </joint>
 
-        <link name="gimbal_link_3">
+        <gazebo reference="${namespace}/gimbal_link_3">
+          <collision>
+            <surface>
+              <contact>
+                <collide_bitmask>${collision_bitmask}</collide_bitmask>
+              </contact>
+            </surface>
+          </collision>
+        </gazebo>
+
+        <link name="${namespace}/gimbal_link_3">
             <inertial>
                 <mass value="0.0001" />
                 <origin xyz="0 0 0" rpy="0 0 0" />
@@ -397,46 +473,80 @@
                 </geometry>
             </visual> -->
         </link>
-        <joint name="gimbal_roll_joint" type="continuous">
-            <parent link="gimbal_link_3" />
-            <child link="gimbal_link_4" />
+        <joint name="${namespace}/gimbal_roll_joint" type="continuous">
+            <parent link="${namespace}/gimbal_link_3" />
+            <child link="${namespace}/gimbal_link_4" />
             <axis xyz="1 0 0" />
             <dynamics damping="0.0" friction="0.0" />
         </joint>
 
-        <link name="gimbal_link_4">
+        <gazebo reference="${namespace}/gimbal_link_4">
+          <collision>
+            <surface>
+              <contact>
+                <collide_bitmask>${collision_bitmask}</collide_bitmask>
+              </contact>
+            </surface>
+          </collision>
+        </gazebo>
+
+        <link name="${namespace}/gimbal_link_4">
             <inertial>
                 <mass value="0.0001" />
                 <origin xyz="0 0 0" rpy="0 0 ${-pi}" />
                 <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001" />
             </inertial>
-<!--             <visual>
-                <geometry>
-                <box size="0.01 0.01 0.01" />
-                </geometry>
-            </visual> -->
+            <visual>
+              <origin xyz="0 0 0" rpy="0 1.57 0"/>
+              <geometry>
+                <mesh filename="package://ardupilot_gazebo/models/util/asus_xtion_pro_camera.dae" scale="1 1 1" />
+              </geometry>
+            </visual>
         </link>
-        <joint name="camera_gimbal_joint" type="continuous">
-            <parent link="gimbal_link_4" />
-            <child link="camera_link" />
+
+        <joint name="${namespace}/camera_gimbal_joint" type="continuous">
+            <parent link="${namespace}/gimbal_link_4" />
+            <child link="${namespace}/camera_link" />
             <axis xyz="0 0 1" />
             <dynamics damping="0.0" friction="0.0" />
         </joint>
-        <link name="camera_link">
+
+        <gazebo reference="${namespace}/camera_link">
+          <collision>
+            <surface>
+              <contact>
+                <collide_bitmask>${collision_bitmask}</collide_bitmask>
+              </contact>
+            </surface>
+          </collision>
+        </gazebo>
+
+        <link name="${namespace}/camera_link">
         </link>
 
-        <joint name="camera_optical_joint" type="fixed">
+        <joint name="${namespace}/camera_optical_joint" type="fixed">
             <origin xyz="0 0 0" rpy="${-pi/2} 0.0 ${-pi/2}" />
-            <parent link="camera_link" />
-            <child link="camera_optical_frame"/>
+            <parent link="${namespace}/camera_link" />
+            <child link="${namespace}/camera_optical_frame"/>
         </joint>
-        <gazebo reference="camera_optical_joint">
+        <gazebo reference="${namespace}/camera_optical_joint">
             <preserveFixedJoint>true</preserveFixedJoint>
         </gazebo>
-        <link name="camera_optical_frame">
+
+        <gazebo reference="${namespace}/camera_optical_frame">
+          <collision>
+            <surface>
+              <contact>
+                <collide_bitmask>${collision_bitmask}</collide_bitmask>
+              </contact>
+            </surface>
+          </collision>
+        </gazebo>
+
+        <link name="${namespace}/camera_optical_frame">
         </link>
         
-        <gazebo reference="gimbal_link_4">
+        <gazebo reference="${namespace}/gimbal_link_4">
             <sensor type="depth" name="camera">
               <update_rate>50.0</update_rate>
               
@@ -464,13 +574,13 @@
                 <!-- Keep this zero, update_rate in the parent <sensor> tag
                   will control the frame rate. -->
                 <updateRate>0.0</updateRate>
-                <cameraName>${namespace}/camera_ir</cameraName>
-                <imageTopicName>/${namespace}/camera/color/image_raw</imageTopicName>
-                <cameraInfoTopicName>/${namespace}/camera/color/camera_info</cameraInfoTopicName>
-                <depthImageTopicName>/${namespace}/camera/depth/image_raw</depthImageTopicName>
-                <depthImageCameraInfoTopicName>/${namespace}/camera/depth/camera_info</depthImageCameraInfoTopicName>
-                <pointCloudTopicName>/${namespace}/camera/depth/points</pointCloudTopicName>
-                <frameName>camera_optical_frame</frameName>
+                <cameraName>${namespace}/camera_ir_gimbal</cameraName>
+                <imageTopicName>/${namespace}/camera_gimbal/color/image_raw</imageTopicName>
+                <cameraInfoTopicName>/${namespace}/camera_gimbal/color/camera_info</cameraInfoTopicName>
+                <depthImageTopicName>/${namespace}/camera_gimbal/depth/image_raw</depthImageTopicName>
+                <depthImageCameraInfoTopicName>/${namespace}/camera_gimbal/depth/camera_info</depthImageCameraInfoTopicName>
+                <pointCloudTopicName>/${namespace}/camera_gimbal/depth/points</pointCloudTopicName>
+                <frameName>camera_gimbal_optical_frame</frameName>
                 <pointCloudCutoff>2.0</pointCloudCutoff>
                 <pointCloudCutoffMax>15.0</pointCloudCutoffMax>
                 <distortionK1>0</distortionK1>
@@ -488,22 +598,24 @@
         </gazebo>
 
         <gazebo>
-          <plugin name="gimbal_controller" filename="libGazeboGimbalPlugin.so"/>
+          <plugin name="gimbal_controller" filename="libGazeboGimbalPlugin.so">
+            <namespace>${namespace}</namespace>
+          </plugin>
         </gazebo>
 
         <xacro:transmisija
           trans_number="g1"
-          joint_name="gimbal_roll_joint">
+          joint_name="${namespace}/gimbal_roll_joint">
         </xacro:transmisija>
 
         <xacro:transmisija
           trans_number="g2"
-          joint_name="gimbal_pitch_joint">
+          joint_name="${namespace}/gimbal_pitch_joint">
         </xacro:transmisija>
 
         <xacro:transmisija
           trans_number="g3"
-          joint_name="gimbal_yaw_joint">
+          joint_name="${namespace}/gimbal_yaw_joint">
         </xacro:transmisija>
 
     </xacro:macro>
@@ -524,6 +636,15 @@
         <child link="${namespace}/electromagnet_bar"/>
       </joint>
 
+      <gazebo reference="${namespace}/electromagnet_bar">
+        <collision>
+          <surface>
+            <contact>
+              <collide_bitmask>${collision_bitmask}</collide_bitmask>
+            </contact>
+          </surface>
+        </collision>
+      </gazebo>
       <link name="${namespace}/electromagnet_bar">
         <inertial>
           <origin xyz="0 0 0" rpy="0 0 0" />
@@ -538,6 +659,15 @@
         </visual>
       </link>
 
+      <gazebo reference="${namespace}/electromagnet_actuator">
+        <collision>
+          <surface>
+            <contact>
+              <collide_bitmask>${collision_bitmask}</collide_bitmask>
+            </contact>
+          </surface>
+        </collision>
+      </gazebo>
       <link name="${namespace}/electromagnet_actuator">
         <inertial>
           <origin xyz="0 0 0" rpy="0 0 0" />
@@ -571,7 +701,7 @@
           <shouldPublish>true</shouldPublish>
           <topicNs>${namespace}/${name}</topicNs>
           <updateRate>100</updateRate>
-          <gain>1.0</gain>
+          <gain>10.0</gain>
         </plugin>
       </gazebo>
 

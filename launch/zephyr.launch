@@ -1,0 +1,50 @@
+<launch>
+
+  <arg name="name"                default="$(env UAV_NAMESPACE)"/>
+  <arg name="tf_prefix"           default="$(arg name)"/>
+  <arg name="x"                   default="0.0"/>
+  <arg name="y"                   default="0.0"/>
+  <arg name="z"                   default="0.5"/>
+  <arg name="enable_ground_truth" default="true"/>
+  <arg name="model"               default="$(find ardupilot_gazebo)/models/zephyr_delta_wing/urdf/zephyr.urdf.xacro" />
+  <arg name="world"               default="$(find ardupilot_gazebo)/worlds/runway.world"/>
+  <arg name="fdm_port_in"         default="9002"/>
+  <arg name="fdm_port_out"        default="9003"/>
+  <arg name="use_sim_time"        default="true"/>
+  <arg name="gui"                 default="true"/>
+  <arg name="remap_gazebo_tf"     default="false"/>
+
+  <!-- Collision bitmask - by default collide with everything -->
+  <arg name="collision_bitmask" default="-1" />
+
+  <!-- Spawn the world -->
+  <include file="$(find ardupilot_gazebo)/launch/empty_world.launch">
+    <arg name="paused"          value="false" />
+    <arg name="use_sim_time"    value="$(arg use_sim_time)"/>
+    <arg name="verbose"         value="true" />
+    <arg name="world_name"      value="$(arg world)" />
+    <arg name="gui"             value="$(arg gui)"/>
+    <arg name="remap_gazebo_tf" value="$(arg remap_gazebo_tf)"/>
+    <arg name="debug"           value="false" />
+  </include>
+
+  <include file="$(find ardupilot_gazebo)/launch/spawn_zephyr.launch">
+    <arg name="name"                value="$(arg name)"/>
+    <arg name="tf_prefix"           value="$(arg tf_prefix)"/>
+    <arg name="x"                   value="$(arg x)"/>
+    <arg name="y"                   value="$(arg y)"/>
+    <arg name="z"                   value="$(arg z)"/>
+    <arg name="enable_ground_truth" value="$(arg enable_ground_truth)"/>
+    <arg name="model"               value="$(arg model)" />
+    <arg name="world"               value="$(arg world)"/>
+    <arg name="fdm_port_in"         value="$(arg fdm_port_in)"/>
+    <arg name="fdm_port_out"        value="$(arg fdm_port_out)"/>
+    <arg name="use_sim_time"        value="$(arg use_sim_time)"/>
+    <arg name="gui"                 value="$(arg gui)"/>
+    <arg name="remap_gazebo_tf"     value="$(arg remap_gazebo_tf)"/>
+
+    <!-- Collision bitmask - by value collide with everything -->
+    <arg name="collision_bitmask" value="$(arg collision_bitmask)" />
+  </include>
+
+</launch>

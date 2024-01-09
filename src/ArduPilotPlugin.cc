@@ -63,7 +63,7 @@ GZ_REGISTER_MODEL_PLUGIN(ArduPilotPlugin)
 /// \param[in] _verbose If true, gzerror if the parameter is not available.
 /// \return True if the parameter was found in _sdf, false otherwise.
 template<class T>
-bool getSdfParam(const sdf::ElementPtr& _sdf,
+bool getSdfParam(const sdf::ElementPtr &_sdf,
   const std::string &_name,
   T &_param,
   const T &_defaultValue,
@@ -465,6 +465,10 @@ public:
 public:
   std::string controlTopicName;
 
+  /// \brief True if control topic is specified, otherwise false.
+public:
+  bool controlTopicEnabled = false;
+
   /// \brief topic for listening to imu sensor data
 public:
   std::string imuTopicName;
@@ -683,8 +687,11 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("controlTopicName")) {
     this->dataPtr->controlTopicName = _sdf->Get<std::string>("controlTopicName");
-  } else
-    this->dataPtr->controlTopicName = "/gazebo/command/motor_speed";
+    this->dataPtr->controlTopicEnabled = true;
+  } else {
+    gzwarn << "Control topic is not used, command are published to joints specified in "
+              "control blocks.";
+  }
   if (_sdf->HasElement("imuTopicName")) {
     this->dataPtr->imuTopicName = _sdf->Get<std::string>("imuTopicName");
   } else
@@ -904,13 +911,16 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     ros::init(argc, argv, "ardupilot_plugin", ros::init_options::NoSigintHandler);
   }
 
-  // Create our ROS node. This acts in a similar manner to
-  // the Gazebo node
-  this->nodeHandle.reset(new ros::NodeHandle("gazebo_client"));
-  imuSub = this->nodeHandle->subscribe(
-    this->dataPtr->imuTopicName, 1, &gazebo::ArduPilotPlugin::ImuCallback, this);
-  motorPub =
-    this->nodeHandle->advertise<mav_msgs::Actuators>(this->dataPtr->controlTopicName, 1);
+  // Only initialize subscribers when using external source of joint control
+  if (this->dataPtr->controlTopicEnabled) {
+    // Create our ROS node. This acts in a similar manner to
+    // the Gazebo node
+    this->nodeHandle.reset(new ros::NodeHandle("gazebo_client"));
+    imuSub = this->nodeHandle->subscribe(
+      this->dataPtr->imuTopicName, 1, &gazebo::ArduPilotPlugin::ImuCallback, this);
+    motorPub = this->nodeHandle->advertise<mav_msgs::Actuators>(
+      this->dataPtr->controlTopicName, 1);
+  }
 }
 
 void ArduPilotPlugin::ImuCallback(const sensor_msgs::ImuConstPtr &msg) { imuMsg = *msg; }
@@ -984,13 +994,57 @@ bool ArduPilotPlugin::InitArduPilotSockets(sdf::ElementPtr _sdf) const
 /////////////////////////////////////////////////
 void ArduPilotPlugin::ApplyMotorForces(const double _dt)
 {
-  mav_msgs::Actuators actuatorMsg;
-  actuatorMsg.header.stamp = ros::Time::now();
-  actuatorMsg.angular_velocities = std::vector<double>{ this->dataPtr->controls[0].cmd,
-    this->dataPtr->controls[2].cmd,
-    this->dataPtr->controls[1].cmd,
-    this->dataPtr->controls[3].cmd };
-  motorPub.publish(actuatorMsg);
+  if (this->dataPtr->controlTopicEnabled) {
+    mav_msgs::Actuators actuatorMsg;
+    actuatorMsg.header.stamp = ros::Time::now();
+    actuatorMsg.angular_velocities = std::vector<double>{ this->dataPtr->controls[0].cmd,
+      this->dataPtr->controls[2].cmd,
+      this->dataPtr->controls[1].cmd,
+      this->dataPtr->controls[3].cmd };
+    motorPub.publish(actuatorMsg);
+    return;
+  }
+
+  // update velocity PID for controls and apply force to joint
+  for (size_t i = 0; i < this->dataPtr->controls.size(); ++i) {
+    if (this->dataPtr->controls[i].useForce) {
+      if (this->dataPtr->controls[i].type == "VELOCITY") {
+        const double velTarget = this->dataPtr->controls[i].cmd
+                                 / this->dataPtr->controls[i].rotorVelocitySlowdownSim;
+        const double vel = this->dataPtr->controls[i].joint->GetVelocity(0);
+        const double error = vel - velTarget;
+        const double force = this->dataPtr->controls[i].pid.Update(error, _dt);
+        this->dataPtr->controls[i].joint->SetForce(0, force);
+      } else if (this->dataPtr->controls[i].type == "POSITION") {
+        /*const double upper_Lim =
+        this->dataPtr->controls[i].joint->GetUpperLimit(0).Radian(); const double
+        lower_Lim = this->dataPtr->controls[i].joint->GetLowerLimit(0).Radian(); const
+        double scaler = 5*(upper_Lim - lower_Lim);
+        */
+        const double posTarget = this->dataPtr->controls[i].cmd;
+        const double pos = this->dataPtr->controls[i].joint->Position(0);
+        const double error = pos - posTarget;
+        const double force = this->dataPtr->controls[i].pid.Update(error, _dt);
+        this->dataPtr->controls[i].joint->SetForce(0, force);
+      } else if (this->dataPtr->controls[i].type == "EFFORT") {
+        const double force = this->dataPtr->controls[i].cmd;
+        this->dataPtr->controls[i].joint->SetForce(0, force);
+      } else {
+        // do nothing
+      }
+    } else {
+      if (this->dataPtr->controls[i].type == "VELOCITY") {
+        this->dataPtr->controls[i].joint->SetVelocity(0, this->dataPtr->controls[i].cmd);
+      } else if (this->dataPtr->controls[i].type == "POSITION") {
+        this->dataPtr->controls[i].joint->SetPosition(0, this->dataPtr->controls[i].cmd);
+      } else if (this->dataPtr->controls[i].type == "EFFORT") {
+        const double force = this->dataPtr->controls[i].cmd;
+        this->dataPtr->controls[i].joint->SetForce(0, force);
+      } else {
+        // do nothing
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1079,10 +1133,9 @@ void ArduPilotPlugin::ReceiveMotorCommand()
             pkt.motorSpeed[this->dataPtr->controls[i].channel], -1.0f, 1.0f);
           this->dataPtr->controls[i].cmd = this->dataPtr->controls[i].multiplier
                                            * (cmd + this->dataPtr->controls[i].offset);
-
           /*
           const double cmd_in = this->dataPtr->controls[i].cmd;
-          if (cmd_in != last_cmd)
+          if (cmd_in != this->dataPtr->last_cmd)
             {
               gzdbg << "apply input chan[" << this->dataPtr->controls[i].channel
                   << "] to control chan[" << i
@@ -1093,7 +1146,7 @@ void ArduPilotPlugin::ReceiveMotorCommand()
                   << "] adjusted cmd [" << this->dataPtr->controls[i].cmd
                    << "].\n";
 
-            last_cmd = cmd_in;
+            this->dataPtr->last_cmd = cmd_in;
             }
             */
         } else {
@@ -1124,28 +1177,39 @@ void ArduPilotPlugin::SendState() const
   //   z down
 
   // get linear acceleration in body frame
-  // const ignition::math::Vector3d linearAccel =
-  //   this->dataPtr->imuSensor->LinearAcceleration();
+  if (!this->dataPtr->controlTopicEnabled) {
+    const ignition::math::Vector3d linearAccel =
+      this->dataPtr->imuSensor->LinearAcceleration();
 
-  /*
-   * Read linear acceleration and angular velocity from the topic
-   * published by the Gazebo models IMU plugin.
-   */
+    pkt.imuLinearAccelerationXYZ[0] = linearAccel.X();
+    pkt.imuLinearAccelerationXYZ[1] = linearAccel.Y();
+    pkt.imuLinearAccelerationXYZ[2] = linearAccel.Z();
+  } else {
+    /*
+     * Read linear acceleration and angular velocity from the topic
+     * published by the Gazebo models IMU plugin.
+     */
 
-  // copy to pkt
-  pkt.imuLinearAccelerationXYZ[0] = imuMsg.linear_acceleration.x;
-  pkt.imuLinearAccelerationXYZ[1] = imuMsg.linear_acceleration.y;
-  pkt.imuLinearAccelerationXYZ[2] = imuMsg.linear_acceleration.z;
+    // copy to pkt
+    pkt.imuLinearAccelerationXYZ[0] = imuMsg.linear_acceleration.x;
+    pkt.imuLinearAccelerationXYZ[1] = imuMsg.linear_acceleration.y;
+    pkt.imuLinearAccelerationXYZ[2] = imuMsg.linear_acceleration.z;
+  }
   // gzerr << "lin accel [" << linearAccel << "]\n";
 
   // get angular velocity in body frame
-  // const ignition::math::Vector3d angularVel =
-  //  this->dataPtr->imuSensor->AngularVelocity();
-
-  // copy to pkt
-  pkt.imuAngularVelocityRPY[0] = imuMsg.angular_velocity.x;
-  pkt.imuAngularVelocityRPY[1] = imuMsg.angular_velocity.y;
-  pkt.imuAngularVelocityRPY[2] = imuMsg.angular_velocity.z;
+  if (!this->dataPtr->controlTopicEnabled) {
+    const ignition::math::Vector3d angularVel =
+      this->dataPtr->imuSensor->AngularVelocity();
+    pkt.imuAngularVelocityRPY[0] = angularVel.X();
+    pkt.imuAngularVelocityRPY[1] = angularVel.Y();
+    pkt.imuAngularVelocityRPY[2] = angularVel.Z();
+  } else {
+    // copy to pkt
+    pkt.imuAngularVelocityRPY[0] = imuMsg.angular_velocity.x;
+    pkt.imuAngularVelocityRPY[1] = imuMsg.angular_velocity.y;
+    pkt.imuAngularVelocityRPY[2] = imuMsg.angular_velocity.z;
+  }
 
   // get inertial pose and velocity
   // position of the uav in world frame

@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+
+<robot name="kopterworx" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Math constants -->
+  <xacro:property name="sin45" value="0.7071068" />
+  <xacro:property name="cos45" value="0.7071068" />
+
+  <!-- Body Properties -->
+  <xacro:property name="rotor_velocity_slowdown_sim" value="15" />
+  <xacro:property name="mesh_file" value="ardupilot_gazebo/models/kopterworx/meshes/kopterworx_model_simple.dae" />
+  <xacro:property name="mesh_scale" value="0.1" />
+  <xacro:property name="prop_scale" value="0.002" />
+  <xacro:property name="mass" value="9" />  <!-- [kg] -->
+  <xacro:property name="body_width" value="0.3" /> <!-- [m] -->
+  <xacro:property name="body_height" value="0.6" /> <!-- [m] -->
+  <xacro:property name="arm_length" value="0.52" /> <!-- [m] -->
+  <xacro:property name="rotor_x_offset" value="${arm_length*cos45}" /> <!-- [m] -->
+  <xacro:property name="rotor_y_offset" value="${arm_length*sin45}" /> <!-- [m] -->
+  <xacro:property name="rotor_offset_top" value="0.115" /> <!-- [m] -->
+
+  <!-- Rotor constants -->
+  <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->
+  <xacro:property name="radius_rotor" value="0.285" /> <!-- [m] -->
+  <xacro:property name="motor_constant" value="2.440724623743665e-04" /> <!-- [kg*m/s^2] -->
+  <xacro:property name="moment_constant" value="0.044148079282817" /> <!-- [m] -->
+  <xacro:property name="time_constant_up" value="0.0125" /> <!-- [s] -->
+  <xacro:property name="time_constant_down" value="0.0125" /> <!-- [s] -->
+  <xacro:property name="max_rot_velocity" value="667" /> <!-- [rad/s] -->
+  <xacro:property name="rotor_drag_coefficient" value="8.06428e-05" />
+  <xacro:property name="rolling_moment_coefficient" value="0.000001" />
+
+  <!-- Tilt link constants -->
+  <xacro:property name="tilt_mass" value="0.1" />
+  <xacro:property name="tilt_length" value="0.05" />
+  <xacro:property name="tilt_radius" value="0.005" />
+  <xacro:property name="tilt_x_offset" value="${arm_length*cos45 + 0.0065}" />
+  <xacro:property name="tilt_y_offset" value="${arm_length*sin45 + 0.0065}" />
+  <xacro:property name="tilt_z_offset" value="0.1" />
+  <xacro:property name="prop_z_offset" value="${tilt_length}" />
+
+
+  <!-- Collision bitmask - By default collides with everything -->
+  <xacro:arg name="collision_bitmask" default="-1" />
+  <xacro:property name="collision_bitmask" value="$(arg collision_bitmask)" />
+
+  <!-- Property Blocks -->
+  <xacro:property name="body_inertia">  
+    <inertia ixx="0.303755" ixy="0.0004484919" ixz="0.0010159727" iyy="0.27722" iyz="-0.001806885" izz="0.469164" />
+  </xacro:property>
+
+  <!-- inertia of a single rotor, assuming it is a cuboid. Height=3mm, width=15mm -->
+  <xacro:property name="rotor_inertia">
+    <xacro:box_inertia x="${radius_rotor}" y="0.015" z="0.003" mass="${mass_rotor*rotor_velocity_slowdown_sim}" />
+  </xacro:property>
+  
+  <!-- Included URDF Files -->
+  <xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_base.urdf.xacro" />
+  <xacro:include filename="$(find ardupilot_gazebo)/models/util/multirotor_tilt.urdf.xacro" />
+
+  <!-- Instantiate multirotor_base_macro once -->
+  <xacro:multirotor_base_macro
+    robot_namespace="$(arg namespace)"
+    mass="${mass}"
+    body_width="${body_width}"
+    body_height="${body_height}"
+    mesh_file="${mesh_file}"
+    mesh_scale="${mesh_scale}">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <xacro:insert_block name="body_inertia" />
+  </xacro:multirotor_base_macro>
+
+  <!-- Instantiate tilt-links -->
+
+  <xacro:prop_tilt 
+    robot_namespace="$(arg namespace)"
+    parent="$(arg namespace)/base_link"
+    number="1"
+    x_axis="0.7071068"
+    y_axis="-0.7071068"
+    mass="${tilt_mass}"
+    length="${tilt_length}"
+    radius="${tilt_radius}">
+    <origin xyz="${tilt_x_offset} ${tilt_y_offset} ${tilt_z_offset}" rpy="0 0 0" />
+  </xacro:prop_tilt>
+  
+  <xacro:prop_tilt 
+    robot_namespace="$(arg namespace)"
+    parent="$(arg namespace)/base_link"
+    number="0"
+    x_axis="0.7071068"
+    y_axis="0.7071068"
+    mass="${tilt_mass}"
+    length="${tilt_length}"
+    radius="${tilt_radius}">
+    <origin xyz="${tilt_x_offset} -${tilt_y_offset} ${tilt_z_offset}" rpy="0 0 0" />
+  </xacro:prop_tilt>
+
+  <xacro:prop_tilt 
+    robot_namespace="$(arg namespace)"
+    parent="$(arg namespace)/base_link"
+    number="2"
+    x_axis="0.7071068"
+    y_axis="0.7071068"
+    mass="${tilt_mass}"
+    length="${tilt_length}"
+    radius="${tilt_radius}">
+    <origin xyz="-${tilt_x_offset} ${tilt_y_offset} ${tilt_z_offset}" rpy="0 0 0" />
+  </xacro:prop_tilt>
+
+  <xacro:prop_tilt 
+    robot_namespace="$(arg namespace)"
+    parent="$(arg namespace)/base_link"
+    number="3"
+    x_axis="0.7071068"
+    y_axis="-0.7071068"
+    mass="${tilt_mass}"
+    length="${tilt_length}"
+    radius="${tilt_radius}">
+    <origin xyz="-${tilt_x_offset} -${tilt_y_offset} ${tilt_z_offset}" rpy="0 0 0" />
+  </xacro:prop_tilt>
+  
+  <!-- Instantiate tilt-joint transmissions -->
+
+  <xacro:tilt_joint_transmission
+    number="1"
+    joint_name="red/tilt_joint_1">
+  </xacro:tilt_joint_transmission>
+
+  <xacro:tilt_joint_transmission
+    number="0"
+    joint_name="red/tilt_joint_0">
+  </xacro:tilt_joint_transmission>
+
+  <xacro:tilt_joint_transmission
+    number="2"
+    joint_name="red/tilt_joint_2">
+  </xacro:tilt_joint_transmission>
+
+  <xacro:tilt_joint_transmission
+    number="3"
+    joint_name="red/tilt_joint_3">
+  </xacro:tilt_joint_transmission>
+
+  <!-- Instantiate rotors -->
+  
+  <xacro:vertical_rotor
+    robot_namespace="$(arg namespace)"
+    suffix="front_left"
+    direction="cw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="$(arg namespace)/tilt_link_1"
+    mass_rotor="${mass_rotor}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="1"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    color="Red"
+    prop_scale="${prop_scale}">
+    <origin xyz="0 0 ${prop_z_offset}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+  
+  <xacro:vertical_rotor
+    robot_namespace="$(arg namespace)"
+    suffix="front_right"
+    direction="ccw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="$(arg namespace)/tilt_link_0"
+    mass_rotor="${mass_rotor}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="0"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    color="Blue"
+    prop_scale="${prop_scale}">
+    <origin xyz="0 0 ${prop_z_offset}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+  
+  <xacro:vertical_rotor
+    robot_namespace="$(arg namespace)"
+    suffix="back_left"
+    direction="ccw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="$(arg namespace)/tilt_link_2"
+    mass_rotor="${mass_rotor}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="2"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    color="Blue"
+    prop_scale="${prop_scale}">
+    <origin xyz="0 0 ${prop_z_offset}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <xacro:vertical_rotor
+    robot_namespace="$(arg namespace)"
+    suffix="back_right"
+    direction="cw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="$(arg namespace)/tilt_link_3"
+    mass_rotor="${mass_rotor}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="3"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    color="Red"
+    prop_scale="${prop_scale}">
+    <origin xyz="0 0 ${prop_z_offset}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+  
+  <gazebo reference="$(arg namespace)/base_link">
+    <dampingFactor>0.001</dampingFactor>
+  </gazebo>
+
+</robot>

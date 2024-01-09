@@ -1,0 +1,9 @@
+<launch>
+
+  <arg name="namespace"   default="$(env UAV_NAMESPACE)"/>
+  <arg name="config_yaml" default="$(find ardupilot_gazebo)/config/apm_config_NAMESPACE.yaml" />
+
+	<!-- Firt run the script that makes the apm_config for namespace -->
+	<node pkg="uav_ros_general" name="generate_mavros_config" type="generate_mavros_config.sh" required="true" args="$(arg config_yaml) $(arg namespace)"/>
+
+</launch>

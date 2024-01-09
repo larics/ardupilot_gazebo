@@ -106,3 +106,7 @@ CATKIN_IGNORE
 *.TXT
 *.bin
 *.DAT
+*.swp
+
+# Ignore generated parameters for $UAV_NAMESPACE uavs
+config/apm_config_NAMESPACE.yaml_*

@@ -4,6 +4,8 @@
 # Exit immediatelly if a command exits with a non-zero status
 set -e
 
+set -x
+
 # Executes a command when DEBUG signal is emitted in this script - should be after every line
 trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 
@@ -17,10 +19,13 @@ PARAM_PATH=$3
 ENABLE_CONSOLE=$4
 ENABLE_MAP=$5
 STREAMRATE=$6
+FRAME=$7
+BINARY=$8
+DEBUG=$9
 
 # Get valid additional arguments
 ADDITIONAL_ARGS=""
-for arg in "${@:7:99}"
+for arg in "${@:10:99}"
 do
   if [[ ! $arg = __* ]]; then
     echo "[run_copter.sh] Found valid argument: $arg"
@@ -48,6 +53,19 @@ if [ -z "${STREAMRATE}" ] ; then
   STREAMRATE="50"
 fi
 
+if [ -z "${FRAME}" ] ; then
+  FRAME="gazebo-iris"
+fi
+
+if [ -z "${BINARY}" ]; then
+  BINARY="ArduCopter"
+fi
+
+DEBUG_ARGS="-D -G"
+if [ "${DEBUG}" = false ]; then
+  DEBUG_ARGS=""
+fi
+
 # Navigate to the startup folder
 STARTUP_DIR="$HOME/Documents/${VEHICLE_NAME}_${VEHICLE_ID}_startup"
 mkdir -p $STARTUP_DIR
@@ -68,6 +86,7 @@ cat <<EOF > ${STARTUP_DIR}/identity.parm
 SYSID_THISMAV ${VEHICLE_ID}
 EOF
 
+
 cat ${PARAM_PATH} >> ${IDENTITY_PATH}
-echo "sim_vehicle.py -v ArduCopter --add-param-file=${IDENTITY_PATH} -f gazebo-iris -I$((${VEHICLE_ID} - 1)) -m \"--mav10 --streamrate=${STREAMRATE} --target-system=${VEHICLE_ID}\" ${SIM_VEHICLE_ARGS}"
-sim_vehicle.py -v ArduCopter --add-param-file=${IDENTITY_PATH} -f gazebo-iris -I$((${VEHICLE_ID} - 1)) -m "--mav10 --streamrate=${STREAMRATE} --target-system=${VEHICLE_ID}" ${SIM_VEHICLE_ARGS}
+echo "sim_vehicle.py ${DEBUG_ARGS} -v ${BINARY} --add-param-file=${IDENTITY_PATH} -f ${FRAME} -I$((${VEHICLE_ID} - 1)) -m \"--mav10 --streamrate=${STREAMRATE} --target-system=${VEHICLE_ID}\" ${SIM_VEHICLE_ARGS}"
+sim_vehicle.py  ${DEBUG_ARGS} -v ${BINARY} --add-param-file=${IDENTITY_PATH} -f ${FRAME} -I$((${VEHICLE_ID} - 1)) -m "--mav10 --streamrate=${STREAMRATE} --target-system=${VEHICLE_ID}" ${SIM_VEHICLE_ARGS}

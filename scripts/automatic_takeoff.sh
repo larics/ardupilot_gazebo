@@ -19,6 +19,11 @@ if [ -z "${ODOMETRY_TOPIC}" ] ; then
   ODOMETRY_TOPIC=mavros/global_position/local
 fi
 
+WAITFORSIM=$3
+if [ -z "${WAITFORSIM}" ] ; then 
+  WAITFORSIM="true"
+fi
+
 # get the path to this script
 MY_PATH=`dirname "$0"`
 MY_PATH=`( cd "$MY_PATH" && pwd )`
@@ -27,7 +32,10 @@ source $MY_PATH/shell_scripts.sh
 # Automatic takeoff
 echo "Automatic takeoff started for $UAV_NAMESPACE UAV"
 waitForRos
-waitForSimulation
+
+if [ "$WAITFORSIM" == "true" ] ; then
+  waitForSimulation
+fi
 
 if [ "$ODOMETRY_TOPIC" == "mavros/global_position/local" ] ; then
   waitForOdometry

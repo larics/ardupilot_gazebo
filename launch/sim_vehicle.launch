@@ -1,16 +1,19 @@
 <launch>
 
-  <arg name="name" default="kopterworx"/>
-  <arg name="id" default="1"/>
-  <arg name="parm_file" default="$(find ardupilot_gazebo)/config/kopterworx_red.parm"/>
-  <arg name="enable_console" default="true"/>
-  <arg name="enable_map" default="false"/>
-  <arg name="streamrate" default="50"/>
-  <arg name="node_start_delay" default="10.0" />
-  <arg name="additional_arguments" default="" />
+  <arg name="name"                  default="kopterworx"/>
+  <arg name="id"                    default="1"/>
+  <arg name="parm_file"             default="$(find ardupilot_gazebo)/config/kopterworx_v432.params"/>
+  <arg name="enable_console"        default="true"/>
+  <arg name="enable_map"            default="false"/>
+  <arg name="streamrate"            default="50"/>
+  <arg name="frame"                 default="gazebo-iris"/>
+  <arg name="node_start_delay"      default="1.0" />
+  <arg name="additional_arguments"  default="" />
+  <arg name="binary"                default="ArduCopter"/>
+  <arg name="debug"                 default="false"/>
 
   <node name="sim_vehicle_startup" pkg="ardupilot_gazebo" type="run_copter.sh" 
-    args="$(arg name) $(arg id) $(arg parm_file) $(arg enable_console) $(arg enable_map) $(arg streamrate) $(arg additional_arguments)" output="screen" 
+    args="$(arg name) $(arg id) $(arg parm_file) $(arg enable_console) $(arg enable_map) $(arg streamrate) $(arg frame) $(arg binary) $(arg debug) $(arg additional_arguments)" output="screen" 
     launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@'"/>
 
 </launch>

@@ -1,25 +1,57 @@
 <launch>
 
-  <arg name="name" default="$(env UAV_NAMESPACE)"/>
-  <arg name="tf_prefix" default="$(arg name)"/>
-	<arg name="x" default="2.0"/>
-	<arg name="y" default="2.0"/>
-	<arg name="z" default="0.5"/>
+  <arg name="name"                default="$(env UAV_NAMESPACE)"/>
+  <arg name="tf_prefix"           default="$(arg name)"/>
+  <arg name="x"                   default="0.0"/>
+  <arg name="y"                   default="0.0"/>
+  <arg name="z"                   default="0.5"/>
   <arg name="enable_ground_truth" default="true"/>
-	<arg name="enable_velodyne" default="false" />
-	<arg name="enable_rotating_velodyne" default="false"/>
-	<arg name="model" value="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx.urdf.xacro" />
-	<arg name="fdm_port_in" default="9012"/>
-	<arg name="fdm_port_out" default="9013"/>
+  <arg name="model"               default="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx.urdf.xacro" />
+  <arg name="world"               default="worlds/empty.world"/>
+  <arg name="fdm_port_in"         default="9002"/>
+  <arg name="fdm_port_out"        default="9003"/>
+  <arg name="use_sim_time"        default="true"/>
+  <arg name="gui"                 default="true"/>
+  <arg name="remap_gazebo_tf"     default="false"/>
+
+  <!-- Camera properties -->
+  <arg name="camera_pose"         default="front_facing_camera"/>
+
+  <!-- Velodyne properties - requires velodyne_simulator -->
+  <arg name="enable_velodyne"           default="false" />
+  <arg name="enable_rotating_velodyne"  default="false"/>
+  <arg name="laser_count"               default="16"/>
+  <arg name="max_range"                 default="50"/>
+
+  <!-- Magnet properties - requires storm_gazebo_ros_magnet-->
+  <arg name="enable_magnet"   default="false" />
+
+  <!-- Gimbal properties -->
+  <arg name="enable_gimbal"   default="false" />
+
+  <!-- Collision bitmask - by default collide with everything -->
+  <arg name="collision_bitmask" default="-1" />
+
+  <!-- Actuators -->
+  <arg name="enable_tilt_rotors"        default="false" />
+  <arg name="enable_simple_manipulator" default="false" />
 
   <!-- send the robot XML to param server -->
 	<param name="$(arg name)/robot_description" command="
 	  $(find xacro)/xacro --inorder $(arg model)
-		namespace:=$(arg name)
-		enable_velodyne:=$(arg enable_velodyne)
-		enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
-		fdm_port_in:=$(arg fdm_port_in)
-		fdm_port_out:=$(arg fdm_port_out)
+    namespace:=$(arg name)
+    enable_velodyne:=$(arg enable_velodyne)
+    enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
+    enable_magnet:=$(arg enable_magnet)
+    enable_gimbal:=$(arg enable_gimbal)
+    fdm_port_in:=$(arg fdm_port_in)
+    fdm_port_out:=$(arg fdm_port_out)
+    max_range:=$(arg max_range)
+    laser_count:=$(arg laser_count)
+    collision_bitmask:=$(arg collision_bitmask)
+    enable_tilt_rotors:=$(arg enable_tilt_rotors)
+    enable_simple_manipulator:=$(arg enable_simple_manipulator)
+    camera_pose:=$(arg camera_pose)
 	  "
 	/>
 
@@ -37,4 +69,43 @@
 	 respawn="false" output="screen" >
 	</node>
   
+  <!-- Start the rotating velodyne controller -->
+  <group if="$(arg enable_rotating_velodyne)">
+    <include file="$(find velodyne_gazebo_plugins)/launch/velodyne_controller.launch">
+      <arg name="namespace" value="$(env UAV_NAMESPACE)"/>
+    </include>
+    </group>
+
+  <!-- Setup the (simple) manipulator control - with movable masses -->
+  <group if="$(arg enable_simple_manipulator)">
+
+    <rosparam command="load"
+            file="$(find ardupilot_gazebo)/config/kopterworx_joint_movable_mass_controller.yaml"
+            ns="$(arg name)"/>
+
+    <node name="controller_spawner_manip" 
+        pkg="controller_manager"
+        type="spawner"
+        output="screen"
+        ns="$(arg name)"
+        args="joint_manip_state_controller 
+              manipulator_position_controller"/>
+  </group>
+
+  <!-- Setup the tilt control -->
+  <group if="$(arg enable_tilt_rotors)">
+
+    <rosparam command="load"
+            file="$(find ardupilot_gazebo)/config/kopterworx_joint_position_tilt_controller.yaml"
+            ns="$(arg name)"/>
+
+    <node name="controller_spawner_tilt" 
+        pkg="controller_manager"
+        type="spawner"
+        output="screen"
+        ns="$(arg name)"
+        args="joint_tilt_state_controller 
+              tilt_joints_position_controller"/>
+  </group>
+
 </launch>

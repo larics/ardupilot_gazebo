@@ -1,0 +1,11 @@
+joint_tilt_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+tilt_joints_position_controller:
+  type: position_controllers/JointGroupPositionController
+  joints:
+    - red/tilt_joint_0
+    - red/tilt_joint_1
+    - red/tilt_joint_2
+    - red/tilt_joint_3

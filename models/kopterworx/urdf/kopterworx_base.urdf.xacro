@@ -10,7 +10,7 @@
   <xacro:property name="rotor_velocity_slowdown_sim" value="15" />
   <xacro:property name="mesh_file" value="ardupilot_gazebo/models/kopterworx/meshes/kopterworx_model_simple.dae" />
   <xacro:property name="mesh_scale" value="0.1" />
-  <xacro:property name="prop_scale" value="0.002" />
+  <xacro:property name="prop_scale" value="0.003" />
   <xacro:property name="mass" value="9" />  <!-- [kg] -->
   <xacro:property name="body_width" value="0.3" /> <!-- [m] -->
   <xacro:property name="body_height" value="0.6" /> <!-- [m] -->
@@ -23,13 +23,17 @@
   <!-- Rotor constants -->
   <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->
   <xacro:property name="radius_rotor" value="0.285" /> <!-- [m] -->
-  <xacro:property name="motor_constant" value="0.000285576174524687" /> <!-- [kg*m/s^2] -->
-  <xacro:property name="moment_constant" value="0.041365783102071" /> <!-- [m] -->
+  <xacro:property name="motor_constant" value="2.440724623743665e-04" /> <!-- [kg*m/s^2] -->
+  <xacro:property name="moment_constant" value="0.044148079282817" /> <!-- [m] -->
   <xacro:property name="time_constant_up" value="0.0125" /> <!-- [s] -->
   <xacro:property name="time_constant_down" value="0.0125" /> <!-- [s] -->
-  <xacro:property name="max_rot_velocity" value="600" /> <!-- [rad/s] -->
+  <xacro:property name="max_rot_velocity" value="667" /> <!-- [rad/s] -->
   <xacro:property name="rotor_drag_coefficient" value="8.06428e-05" />
   <xacro:property name="rolling_moment_coefficient" value="0.000001" />
+
+  <!-- Collision bitmask - By default collides with everything -->
+  <xacro:arg name="collision_bitmask" default="-1" />
+  <xacro:property name="collision_bitmask" value="$(arg collision_bitmask)" />
 
   <!-- Property Blocks -->
   <xacro:property name="body_inertia">  
@@ -143,6 +147,13 @@
 
   <gazebo reference="$(arg namespace)/base_link">
     <dampingFactor>0.001</dampingFactor>
+    <collision>
+      <surface>
+        <contact>
+          <collide_bitmask>${collision_bitmask}</collide_bitmask>
+        </contact>
+      </surface>
+    </collision>
   </gazebo>
 
 </robot>
