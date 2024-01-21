@@ -14,10 +14,11 @@
   <xacro:property name="max_range" value="$(arg max_range)"/>
   <xacro:property name="laser_count" value="$(arg laser_count)"/>
   <xacro:property name="camera_pose" value="$(arg camera_pose)"/>
-  <xacro:property name="enable_wind" value="$(arg enable_wind)" />
-  <xacro:property name="wind_force" value="$(arg wind_force)" />
-  <xacro:property name="wind_start" value="$(arg wind_start)" />
-  <xacro:property name="wind_duration" value="$(arg wind_duration)" />
+
+  <xacro:property name="enable_wind"      value="$(arg enable_wind)" />
+  <xacro:property name="wind_force"       value="$(arg wind_force)" />
+  <xacro:property name="wind_start"       value="$(arg wind_start)" />
+  <xacro:property name="wind_duration"    value="$(arg wind_duration)" />
   <xacro:property name="wind_direction_x" value="$(arg wind_direction_x)" />
   <xacro:property name="wind_direction_y" value="$(arg wind_direction_y)" />
   <xacro:property name="wind_direction_z" value="$(arg wind_direction_z)" />
@@ -28,7 +29,7 @@
   
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>/$(arg namespace)</robotNamespace>
+      <robotNamespace>/$(arg namespace)/</robotNamespace>
       <robotParam>/$(arg namespace)/robot_description </robotParam>
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
@@ -39,7 +40,7 @@
     <gazebo>
         <!-- wind plugin -->
         <plugin name="wind_plugin" filename="librotors_gazebo_wind_plugin.so">
-          <robotNamespace>$(arg namespace)/</robotNamespace>
+          <robotNamespace>$(arg namespace)</robotNamespace>
           <xyzOffset>0 0 0</xyzOffset>
           <frameId>$(arg namespace)/base_link</frameId>
           <linkName>$(arg namespace)/base_link</linkName>

@@ -30,13 +30,13 @@
   <arg name="enable_gimbal"   default="false" />
 
   <!-- Wind properties -->
-  <arg name="enable_wind"   default="true" />
-  <arg name="wind_force"    default="10" />
-  <arg name="wind_start"    default="0" />
-  <arg name="wind_duration"   default="1000" />
-  <arg name="wind_direction_x"   default="1.0" />
-  <arg name="wind_direction_y"   default="0.0" />
-  <arg name="wind_direction_z"   default="0.0" />
+  <arg name="enable_wind"       default="true" />
+  <arg name="wind_force"        default="10" />
+  <arg name="wind_start"        default="60" />
+  <arg name="wind_duration"     default="1000" />
+  <arg name="wind_direction_x"  default="1.0" />
+  <arg name="wind_direction_y"  default="0.0" />
+  <arg name="wind_direction_z"  default="0.0" />
 
   <!-- Collision bitmask - by default collide with everything -->
   <arg name="collision_bitmask" default="-1" />
@@ -87,10 +87,10 @@
     <arg name="enable_gimbal"   value="$(arg enable_gimbal)" />
 
     <!-- Wind properties -->
-    <arg name="enable_wind"   value="$(arg enable_wind)" />
-    <arg name="wind_force"   value="$(arg wind_force)" />
-    <arg name="wind_start"   value="$(arg wind_start)" />
-    <arg name="wind_duration"   value="$(arg wind_duration)" />
+    <arg name="enable_wind"        value="$(arg enable_wind)" />
+    <arg name="wind_force"         value="$(arg wind_force)" />
+    <arg name="wind_start"         value="$(arg wind_start)" />
+    <arg name="wind_duration"      value="$(arg wind_duration)" />
     <arg name="wind_direction_x"   value="$(arg wind_direction_x)" />
     <arg name="wind_direction_y"   value="$(arg wind_direction_y)" />
     <arg name="wind_direction_z"   value="$(arg wind_direction_z)" />
