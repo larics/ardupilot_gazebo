@@ -29,6 +29,15 @@
   <!-- Gimbal properties -->
   <arg name="enable_gimbal"   default="false" />
 
+  <!-- Wind properties -->
+  <arg name="enable_wind"   default="true" />
+  <arg name="wind_force"    default="10" />
+  <arg name="wind_start"    default="5" />
+  <arg name="wind_duration"   default="10" />
+  <arg name="wind_direction_x"   default="1.0" />
+  <arg name="wind_direction_y"   default="0.0" />
+  <arg name="wind_direction_z"   default="0.0" />
+
   <!-- Collision bitmask - by default collide with everything -->
   <arg name="collision_bitmask" default="-1" />
 
@@ -52,6 +61,13 @@
     enable_tilt_rotors:=$(arg enable_tilt_rotors)
     enable_simple_manipulator:=$(arg enable_simple_manipulator)
     camera_pose:=$(arg camera_pose)
+    enable_wind:=$(arg enable_wind)
+    wind_force:=$(arg wind_force)
+    wind_start:=$(arg wind_start)
+    wind_duration:=$(arg wind_duration)
+    wind_direction_x:=$(arg wind_direction_x)
+    wind_direction_y:=$(arg wind_direction_y)
+    wind_direction_z:=$(arg wind_direction_z)
 	  "
 	/>
 
