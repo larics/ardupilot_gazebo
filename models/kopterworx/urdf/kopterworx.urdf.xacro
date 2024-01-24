@@ -17,6 +17,7 @@
 
   <xacro:property name="enable_wind"      value="$(arg enable_wind)" />
   <xacro:property name="wind_force"       value="$(arg wind_force)" />
+  <xacro:property name="wind_force_mean"  value="$(arg wind_force_mean)" />
   <xacro:property name="wind_start"       value="$(arg wind_start)" />
   <xacro:property name="wind_duration"    value="$(arg wind_duration)" />
   <xacro:property name="wind_direction_x" value="$(arg wind_direction_x)" />
@@ -45,7 +46,7 @@
           <frameId>$(arg namespace)/base_link</frameId>
           <linkName>$(arg namespace)/base_link</linkName>
           <windDirection>1 0.0 0.0</windDirection>
-          <windForceMean>0</windForceMean>
+          <windForceMean>$(arg wind_force_mean)</windForceMean>
           <windForceVariance>0.0</windForceVariance>
           <windGustDirection>$(arg wind_direction_x) $(arg wind_direction_y) $(arg wind_direction_z)</windGustDirection>
           <windGustStart>$(arg wind_start)</windGustStart>

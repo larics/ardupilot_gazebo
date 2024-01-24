@@ -32,6 +32,7 @@
   <!-- Wind properties -->
   <arg name="enable_wind"       default="true" />
   <arg name="wind_force"        default="10" />
+  <arg name="wind_force_mean"   default="10" />
   <arg name="wind_start"        default="60" />
   <arg name="wind_duration"     default="1000" />
   <arg name="wind_direction_x"  default="1.0" />
@@ -88,6 +89,7 @@
 
     <!-- Wind properties -->
     <arg name="enable_wind"        value="$(arg enable_wind)" />
+    <arg name="wind_force_mean"    value="$(arg wind_force_mean)" />
     <arg name="wind_force"         value="$(arg wind_force)" />
     <arg name="wind_start"         value="$(arg wind_start)" />
     <arg name="wind_duration"      value="$(arg wind_duration)" />

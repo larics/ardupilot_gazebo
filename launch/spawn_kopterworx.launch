@@ -32,6 +32,7 @@
   <!-- Wind properties -->
   <arg name="enable_wind"       default="true" />
   <arg name="wind_force"        default="10" />
+  <arg name="wind_force_mean"   default="10" />
   <arg name="wind_start"        default="5" />
   <arg name="wind_duration"     default="10" />
   <arg name="wind_direction_x"   default="1.0" />
@@ -63,6 +64,7 @@
     camera_pose:=$(arg camera_pose)
     enable_wind:=$(arg enable_wind)
     wind_force:=$(arg wind_force)
+    wind_force_mean:=$(arg wind_force_mean)
     wind_start:=$(arg wind_start)
     wind_duration:=$(arg wind_duration)
     wind_direction_x:=$(arg wind_direction_x)
