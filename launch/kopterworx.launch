@@ -30,7 +30,7 @@
   <arg name="enable_gimbal"   default="false" />
 
   <!-- Wind properties -->
-  <arg name="enable_wind"       default="true" />
+  <arg name="enable_wind"       default="false" />
   <arg name="wind_force"        default="10" />
   <arg name="wind_force_mean"   default="10" />
   <arg name="wind_start"        default="60" />
