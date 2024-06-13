@@ -28,6 +28,7 @@
 
   <!-- Gimbal properties -->
   <arg name="enable_gimbal"   default="false" />
+  <arg name="gimbal_type"     default="gimbal_ypr" />
 
   <!-- Wind properties -->
   <arg name="enable_wind"       default="false" />
@@ -86,6 +87,7 @@
 
     <!-- Gimbal properties -->
     <arg name="enable_gimbal"   value="$(arg enable_gimbal)" />
+    <arg name="gimbal_type"     value="$(arg gimbal_type)" />
 
     <!-- Wind properties -->
     <arg name="enable_wind"        value="$(arg enable_wind)" />

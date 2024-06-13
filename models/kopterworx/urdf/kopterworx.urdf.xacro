@@ -6,6 +6,8 @@
   <xacro:property name="enable_velodyne" value="$(arg enable_velodyne)"/>
   <xacro:property name="enable_magnet" value="$(arg enable_magnet)"/>
   <xacro:property name="enable_gimbal" value="$(arg enable_gimbal)"/>
+  <xacro:arg name="gimbal_type" default="gimbal_ypr" />
+  <xacro:property name="gimbal_type" value="$(arg gimbal_type)" />
   <xacro:property name="enable_rotating_velodyne" value="$(arg enable_rotating_velodyne)" />
   <xacro:property name="enable_tilt_rotors" value="$(arg enable_tilt_rotors)"/>
   <xacro:property name="enable_simple_manipulator" value="$(arg enable_simple_manipulator)"/>
@@ -245,18 +247,38 @@
   </xacro:unless>
 
   <xacro:if value="${enable_gimbal}">
-    <xacro:gimbal_macro 
-      namespace="$(arg namespace)"
-      parent="${namespace}/base_link">
-      
-      <xacro:if value="${camera_pose == 'front_facing_camera'}">
-        <xacro:insert_block name="front_facing_camera"/>    
-      </xacro:if>
+    <!--Default gimbal in yaw-pitch-roll configuration.-->
+    <xacro:if value="${'gimbal_ypr' == gimbal_type}">
+      <xacro:gimbal_macro 
+        namespace="$(arg namespace)"
+        parent="${namespace}/base_link">
+        
+        <xacro:if value="${camera_pose == 'front_facing_camera'}">
+          <xacro:insert_block name="front_facing_camera"/>    
+        </xacro:if>
 
-      <xacro:if value="${camera_pose == 'down_facing_camera'}">
-        <xacro:insert_block name="down_facing_camera"/>    
-      </xacro:if>
-    </xacro:gimbal_macro>
+        <xacro:if value="${camera_pose == 'down_facing_camera'}">
+          <xacro:insert_block name="down_facing_camera"/>    
+        </xacro:if>
+      </xacro:gimbal_macro>
+    </xacro:if>
+
+    <!--Gimbal in yaw-roll-pitch configuration.-->
+    <xacro:if value="${'gimbal_yrp' == gimbal_type}">
+      <xacro:gimbal_yrp_macro 
+        namespace="$(arg namespace)"
+        parent="${namespace}/base_link">
+        
+        <xacro:if value="${camera_pose == 'front_facing_camera'}">
+          <xacro:insert_block name="front_facing_camera"/>    
+        </xacro:if>
+
+        <xacro:if value="${camera_pose == 'down_facing_camera'}">
+          <xacro:insert_block name="down_facing_camera"/>    
+        </xacro:if>
+      </xacro:gimbal_yrp_macro>
+    </xacro:if>
+    
   </xacro:if>
 
 </robot>

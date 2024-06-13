@@ -28,6 +28,7 @@
 
   <!-- Gimbal properties -->
   <arg name="enable_gimbal"   default="false" />
+  <arg name="gimbal_type"     default="gimbal_ypr" />
 
   <!-- Wind properties -->
   <arg name="enable_wind"       default="false" />
@@ -54,6 +55,7 @@
     enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
     enable_magnet:=$(arg enable_magnet)
     enable_gimbal:=$(arg enable_gimbal)
+    gimbal_type:=$(arg gimbal_type)
     fdm_port_in:=$(arg fdm_port_in)
     fdm_port_out:=$(arg fdm_port_out)
     max_range:=$(arg max_range)
