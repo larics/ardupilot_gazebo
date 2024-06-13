@@ -43,7 +43,7 @@
     <gazebo>
         <!-- wind plugin -->
         <plugin name="wind_plugin" filename="librotors_gazebo_wind_plugin.so">
-          <robotNamespace>$(arg namespace)</robotNamespace>
+          <robotNamespace>$(arg namespace)/</robotNamespace>
           <xyzOffset>0 0 0</xyzOffset>
           <frameId>$(arg namespace)/base_link</frameId>
           <linkName>$(arg namespace)/base_link</linkName>
