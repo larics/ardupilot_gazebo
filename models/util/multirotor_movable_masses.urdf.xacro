@@ -4,14 +4,14 @@
   
   <!-- Macro for a simple 3D manipulator. -->
   <xacro:macro name="simple_manipulator" 
-    params="robot_namespace number parent mass radius limit_low limit_high color *origin">
+    params="robot_namespace number parent mass radius limit_low limit_high velocity color *origin">
 
     <joint name="${robot_namespace}/movable_mass_x_joint_${number}" type="prismatic">
       <xacro:insert_block name="origin"/>
       <axis xyz="1 0 0"/>
       <parent link="${parent}"/>
       <child link="${robot_namespace}/movable_mass_x_link_${number}"/>
-      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="1."/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="${velocity}"/>
     </joint>
 
     <link name="${robot_namespace}/movable_mass_x_link_${number}">
@@ -30,7 +30,7 @@
       <axis xyz="0 1 0"/>
       <parent link="${robot_namespace}/movable_mass_x_link_${number}"/>
       <child link="${robot_namespace}/movable_mass_y_link_${number}"/>
-      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="1."/>
+      <limit lower="${limit_low}" upper="${limit_high}" effort="1000" velocity="${velocity}"/>
     </joint>
 
     <link name="${robot_namespace}/movable_mass_y_link_${number}">
@@ -49,7 +49,7 @@
       <axis xyz="0 0 1"/>
       <parent link="${robot_namespace}/movable_mass_y_link_${number}"/>
       <child link="${robot_namespace}/movable_mass_link_${number}"/>
-      <limit lower="${limit_low}" upper="${limit_high}" effort="5000" velocity="1."/>
+      <limit lower="0" upper="0" effort="5000" velocity="${velocity}"/>
     </joint>
 
     <link name="${robot_namespace}/movable_mass_link_${number}">
@@ -60,12 +60,6 @@
         </geometry>
       </visual>
 
-      <collision>
-        <geometry>
-          <sphere radius="${radius}"/>
-        </geometry>
-      </collision>
-      
       <inertial>
         <origin rpy="0 0 0" xyz="0 0 0"/>
         <mass value="${mass}"/>
