@@ -88,7 +88,7 @@ private:
 
   /// \brief Send state to ArduPilot
 private:
-  void SendState() const;
+  void SendState();
 
   /// \brief Init ardupilot socket
 private:

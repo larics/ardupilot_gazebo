@@ -16,6 +16,7 @@
  */
 #include <fcntl.h>
 #include <functional>
+#include <thread>
 #ifdef _WIN32
 #include <Winsock2.h>
 #include <Ws2def.h>
@@ -472,6 +473,12 @@ public:
   /// \brief topic for listening to imu sensor data
 public:
   std::string imuTopicName;
+
+public:
+  std::thread connection_thread;
+
+public:
+  fdmPacket pkt;
 };
 
 /////////////////////////////////////////////////
@@ -921,6 +928,28 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     motorPub = this->nodeHandle->advertise<mav_msgs::Actuators>(
       this->dataPtr->controlTopicName, 1);
   }
+
+  this->dataPtr->connection_thread = std::thread([&]() {
+    int paused_counter = 0;
+    while (true) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      double curr_time = this->dataPtr->model->GetWorld()->SimTime().Double();
+      double last_time = this->dataPtr->lastControllerUpdateTime.Double();
+
+      if (curr_time - last_time > 0) {
+        paused_counter = 0;
+        continue;
+      }
+
+      paused_counter++;
+      // gzdbg << paused_counter << "\n";
+      if (paused_counter < 100) { continue; }
+
+      if (this->dataPtr->arduPilotOnline) {
+        this->dataPtr->socket_out.Send(&this->dataPtr->pkt, sizeof(this->dataPtr->pkt));
+      }
+    }
+  });
 }
 
 void ArduPilotPlugin::ImuCallback(const sensor_msgs::ImuConstPtr &msg) { imuMsg = *msg; }
@@ -1164,12 +1193,11 @@ void ArduPilotPlugin::ReceiveMotorCommand()
 }
 
 /////////////////////////////////////////////////
-void ArduPilotPlugin::SendState() const
+void ArduPilotPlugin::SendState()
 {
   // send_fdm
-  fdmPacket pkt;
 
-  pkt.timestamp = this->dataPtr->model->GetWorld()->SimTime().Double();
+  this->dataPtr->pkt.timestamp = this->dataPtr->model->GetWorld()->SimTime().Double();
 
   // asssumed that the imu orientation is:
   //   x forward
@@ -1181,19 +1209,19 @@ void ArduPilotPlugin::SendState() const
     const ignition::math::Vector3d linearAccel =
       this->dataPtr->imuSensor->LinearAcceleration();
 
-    pkt.imuLinearAccelerationXYZ[0] = linearAccel.X();
-    pkt.imuLinearAccelerationXYZ[1] = linearAccel.Y();
-    pkt.imuLinearAccelerationXYZ[2] = linearAccel.Z();
+    this->dataPtr->pkt.imuLinearAccelerationXYZ[0] = linearAccel.X();
+    this->dataPtr->pkt.imuLinearAccelerationXYZ[1] = linearAccel.Y();
+    this->dataPtr->pkt.imuLinearAccelerationXYZ[2] = linearAccel.Z();
   } else {
     /*
      * Read linear acceleration and angular velocity from the topic
      * published by the Gazebo models IMU plugin.
      */
 
-    // copy to pkt
-    pkt.imuLinearAccelerationXYZ[0] = imuMsg.linear_acceleration.x;
-    pkt.imuLinearAccelerationXYZ[1] = imuMsg.linear_acceleration.y;
-    pkt.imuLinearAccelerationXYZ[2] = imuMsg.linear_acceleration.z;
+    // copy to this->dataPtr->pkt
+    this->dataPtr->pkt.imuLinearAccelerationXYZ[0] = imuMsg.linear_acceleration.x;
+    this->dataPtr->pkt.imuLinearAccelerationXYZ[1] = imuMsg.linear_acceleration.y;
+    this->dataPtr->pkt.imuLinearAccelerationXYZ[2] = imuMsg.linear_acceleration.z;
   }
   // gzerr << "lin accel [" << linearAccel << "]\n";
 
@@ -1201,14 +1229,14 @@ void ArduPilotPlugin::SendState() const
   if (!this->dataPtr->controlTopicEnabled) {
     const ignition::math::Vector3d angularVel =
       this->dataPtr->imuSensor->AngularVelocity();
-    pkt.imuAngularVelocityRPY[0] = angularVel.X();
-    pkt.imuAngularVelocityRPY[1] = angularVel.Y();
-    pkt.imuAngularVelocityRPY[2] = angularVel.Z();
+    this->dataPtr->pkt.imuAngularVelocityRPY[0] = angularVel.X();
+    this->dataPtr->pkt.imuAngularVelocityRPY[1] = angularVel.Y();
+    this->dataPtr->pkt.imuAngularVelocityRPY[2] = angularVel.Z();
   } else {
-    // copy to pkt
-    pkt.imuAngularVelocityRPY[0] = imuMsg.angular_velocity.x;
-    pkt.imuAngularVelocityRPY[1] = imuMsg.angular_velocity.y;
-    pkt.imuAngularVelocityRPY[2] = imuMsg.angular_velocity.z;
+    // copy to this->dataPtr->pkt
+    this->dataPtr->pkt.imuAngularVelocityRPY[0] = imuMsg.angular_velocity.x;
+    this->dataPtr->pkt.imuAngularVelocityRPY[1] = imuMsg.angular_velocity.y;
+    this->dataPtr->pkt.imuAngularVelocityRPY[2] = imuMsg.angular_velocity.z;
   }
 
   // get inertial pose and velocity
@@ -1243,20 +1271,20 @@ void ArduPilotPlugin::SendState() const
   // gzerr << "ned to model [" << NEDToModelXForwardZUp << "]\n";
 
   // N
-  pkt.positionXYZ[0] = NEDToModelXForwardZUp.Pos().X();
+  this->dataPtr->pkt.positionXYZ[0] = NEDToModelXForwardZUp.Pos().X();
 
   // E
-  pkt.positionXYZ[1] = NEDToModelXForwardZUp.Pos().Y();
+  this->dataPtr->pkt.positionXYZ[1] = NEDToModelXForwardZUp.Pos().Y();
 
   // D
-  pkt.positionXYZ[2] = NEDToModelXForwardZUp.Pos().Z();
+  this->dataPtr->pkt.positionXYZ[2] = NEDToModelXForwardZUp.Pos().Z();
 
   // imuOrientationQuat is the rotation from world NED frame
   // to the uav frame.
-  pkt.imuOrientationQuat[0] = NEDToModelXForwardZUp.Rot().W();
-  pkt.imuOrientationQuat[1] = NEDToModelXForwardZUp.Rot().X();
-  pkt.imuOrientationQuat[2] = NEDToModelXForwardZUp.Rot().Y();
-  pkt.imuOrientationQuat[3] = NEDToModelXForwardZUp.Rot().Z();
+  this->dataPtr->pkt.imuOrientationQuat[0] = NEDToModelXForwardZUp.Rot().W();
+  this->dataPtr->pkt.imuOrientationQuat[1] = NEDToModelXForwardZUp.Rot().X();
+  this->dataPtr->pkt.imuOrientationQuat[2] = NEDToModelXForwardZUp.Rot().Y();
+  this->dataPtr->pkt.imuOrientationQuat[3] = NEDToModelXForwardZUp.Rot().Z();
 
   // gzdbg << "imu [" << gazeboXYZToModelXForwardZDown.rot.GetAsEuler()
   //       << "]\n";
@@ -1270,9 +1298,9 @@ void ArduPilotPlugin::SendState() const
     this->dataPtr->model->GetLink()->WorldLinearVel();
   const ignition::math::Vector3d velNEDFrame =
     this->gazeboXYZToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
-  pkt.velocityXYZ[0] = velNEDFrame.X();
-  pkt.velocityXYZ[1] = velNEDFrame.Y();
-  pkt.velocityXYZ[2] = velNEDFrame.Z();
+  this->dataPtr->pkt.velocityXYZ[0] = velNEDFrame.X();
+  this->dataPtr->pkt.velocityXYZ[1] = velNEDFrame.Y();
+  this->dataPtr->pkt.velocityXYZ[2] = velNEDFrame.Z();
   /* NOT MERGED IN MASTER YET
     if (!this->dataPtr->gpsSensor)
       {
@@ -1298,5 +1326,5 @@ void ArduPilotPlugin::SendState() const
     environment.wind.z)
      // pkt.airspeed = (pkt.velocity - wind).length()
   */
-  this->dataPtr->socket_out.Send(&pkt, sizeof(pkt));
+  this->dataPtr->socket_out.Send(&this->dataPtr->pkt, sizeof(this->dataPtr->pkt));
 }
