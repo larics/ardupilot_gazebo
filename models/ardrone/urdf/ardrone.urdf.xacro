@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+
+<robot name="uav" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="namespace" value="$(arg namespace)" />
+  <xacro:property name="enable_velodyne" value="$(arg enable_velodyne)"/>
+  <xacro:property name="enable_rotating_velodyne" value="$(arg enable_rotating_velodyne)" />
+  <xacro:property name="fdm_port_in" value="$(arg fdm_port_in)"/>
+  <xacro:property name="fdm_port_out" value="$(arg fdm_port_out)"/>
+  <xacro:property name="max_range" value="$(arg max_range)"/>
+  <xacro:property name="laser_count" value="$(arg laser_count)"/>
+  <xacro:property name="camera_pose" value="$(arg camera_pose)"/>
+
+  <!-- Collision bitmask - By default collides with everything -->
+  <xacro:arg name="collision_bitmask" default="-1" />
+  <xacro:property name="collision_bitmask" value="$(arg collision_bitmask)" />
+  
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/$(arg namespace)/</robotNamespace>
+      <robotParam>/$(arg namespace)/robot_description </robotParam>
+      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    </plugin>
+  </gazebo>
+
+  <xacro:property name="horizontal_velodyne_origin">
+    <origin xyz="0.08 0. -0.1578" rpy="-3.141592653589793 0.1323284641020683 0." />
+  </xacro:property>
+  
+  <xacro:property name="front_facing_camera">
+    <origin xyz="0.2 0 0.05" rpy="0 0 0"/>
+  </xacro:property>
+
+  <xacro:property name="down_facing_camera">
+    <origin xyz="0 0.2 -0.3" rpy="-1.570796 1.570796 0"/>
+  </xacro:property>
+
+  <xacro:property name="camera_mass" value="1e-5"/>
+  <xacro:property name="camera_size" value="0.05" />
+  <xacro:property name="camera_inertia">
+    <inertia
+    ixx="1e-12"
+    iyy="1e-12"
+    izz="1e-12"
+    ixy="0.0" ixz="0.0" iyz="0.0" />
+  </xacro:property>
+
+  <xacro:include filename="$(find ardupilot_gazebo)/models/ardrone/urdf/ardrone_base.urdf.xacro" />
+  <xacro:include filename="$(find rotors_description)/urdf/component_snippets.xacro" />
+  
+  <!-- Ardupilot plugin 
+    NOTE: thrust_multiplier 
+      Value is tuned in order for mavros/setpoint_raw/attitude/thrust to reflect real-world behavior. 
+  -->
+  <xacro:ardupilot
+    imu_topic="/${namespace}/imu"
+    control_topic="/${namespace}/gazebo/command/motor_speed"
+    imu_sensor_name="${namespace}::imu_link::imu_sensor"
+    rotor_0_joint="${namespace}::${namespace}/rotor_0_joint"
+    rotor_1_joint="${namespace}::${namespace}/rotor_1_joint"
+    rotor_2_joint="${namespace}::${namespace}/rotor_2_joint"
+    rotor_3_joint="${namespace}::${namespace}/rotor_3_joint"
+    thrust_multiplier="667"
+    fdm_port_in="${fdm_port_in}"
+    fdm_port_out="${fdm_port_out}">
+  </xacro:ardupilot>
+
+  <xacro:if value="${enable_velodyne}">
+
+    <xacro:if value="${enable_rotating_velodyne}">
+      <xacro:include filename="$(find velodyne_description)/urdf/LiDAR-X-rotating.urdf.xacro"/>
+      <xacro:lidar-x
+        parent="${namespace}/base_link_inertia"
+        name="velodyne"
+        topic="${namespace}/velodyne_points"
+        hz="10"
+        samples="440"
+        gpu="false"
+        min_range="1" 
+        max_range="${max_range}" 
+        lasers="32">
+        <xacro:insert_block name="horizontal_velodyne_origin"/>
+      </xacro:lidar-x>
+    </xacro:if>
+
+    <xacro:unless value="${enable_rotating_velodyne}">
+      <xacro:include filename="$(find velodyne_description)/urdf/LiDAR-X.urdf.xacro"/>
+      <xacro:lidar-x
+        parent="${namespace}/base_link_inertia"
+        name="velodyne"
+        topic="${namespace}/velodyne_points" 
+        hz="10"
+        samples="440"
+        gpu="false"
+        min_range="1"
+        max_range="${max_range}"
+        lasers="32">
+        <xacro:insert_block name="horizontal_velodyne_origin"/>
+      </xacro:lidar-x>
+    </xacro:unless>
+
+  </xacro:if>
+
+  <!-- Realistic odometry sensor with noise -->
+  <xacro:odometry_plugin_macro
+    namespace="${namespace}"
+    odometry_sensor_suffix=""
+    parent_link="${namespace}/base_link"
+    pose_topic="pose"
+    pose_with_covariance_topic="pose_with_covariance"
+    position_topic="position"
+    transform_topic="transform"
+    odometry_topic="odometry"
+    parent_frame_id="world"
+    child_frame_id="${namespace}/base_link"
+    mass_odometry_sensor="0.01"
+    measurement_divisor="20"
+    measurement_delay="0"
+    unknown_delay="0.0"
+    noise_normal_position="0.0 0.0 0.0"
+    noise_normal_quaternion="0.0 0.0 0.0"
+    noise_normal_linear_velocity="0.0 0.0 0.0"
+    noise_normal_angular_velocity="0.0 0.0 0.0"
+    noise_uniform_position="0.0 0.0 0.0"
+    noise_uniform_quaternion="0.0 0.0 0.0"
+    noise_uniform_linear_velocity="0.0 0.0 0.0"
+    noise_uniform_angular_velocity="0.0 0.0 0.0"
+    enable_odometry_map="false"
+    odometry_map=""
+    image_scale="">
+    <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" /> <!-- [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] -->
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </xacro:odometry_plugin_macro>
+
+</robot>

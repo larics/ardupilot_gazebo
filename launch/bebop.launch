@@ -12,6 +12,7 @@
 	<arg name="enable_velodyne" default="false" />
 	<arg name="enable_magnet" default="false" />
 	<arg name="model" value="$(find ardupilot_gazebo)/models/bebop/urdf/bebop.urdf.xacro" />
+	<arg name="collision_bitmask" default="-1" />
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="paused" value="false" />
@@ -26,7 +27,7 @@
 	  namespace:=$(arg name)
 	  camera_namespace:=$(arg camera_namespace)
 	  enable_velodyne:=$(arg enable_velodyne)
-		enable_magnet:=$(arg enable_magnet)
+	  enable_magnet:=$(arg enable_magnet)
 	  "
 	/>
 

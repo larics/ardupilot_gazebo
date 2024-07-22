@@ -1,54 +1,66 @@
-<?xml version="1.0"?>
-
 <launch>
-  <arg name="name" default="uav"/>
-  <arg name="x" default="0.0"/>
-  <arg name="y" default="0.0"/>
-  <arg name="z" default="2.10421"/>
-  <arg name="enable_logging" default="false"/>
+
+  <arg name="name"                default="$(env UAV_NAMESPACE)"/>
+  <arg name="tf_prefix"           default="$(arg name)"/>
+  <arg name="x"                   default="0.0"/>
+  <arg name="y"                   default="0.0"/>
+  <arg name="z"                   default="0.5"/>
   <arg name="enable_ground_truth" default="true"/>
-  <arg name="log_file" default="uav_log"/>
-  <arg name="exclude_floor_link_from_collision_check" default="ground_plane::link"/>
-  <arg name="model_type" default="uav" />
-  <arg name="model" value="$(find ardupilot_gazebo)/models/ardrone/urdf/$(arg model_type).gazebo.xacro" />
-  <arg name="manipulator_type" default="none" />
-  <arg name="manipulator_tool" default="none" />
-  <arg name="mount_magnet" default="false" />
-  <arg name="mount_magnet_with_disk" default="false" />
-  <arg name="magnet_dipole_moment_z" default="970" />
+  <arg name="model"               default="$(find ardupilot_gazebo)/models/ardrone/urdf/ardrone.urdf.xacro" />
+  <arg name="world"               default="worlds/empty.world"/>
+  <arg name="fdm_port_in"         default="9002"/>
+  <arg name="fdm_port_out"        default="9003"/>
+  <arg name="use_sim_time"        default="true"/>
+  <arg name="gui"                 default="true"/>
+  <arg name="remap_gazebo_tf"     default="false"/>
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-      <arg name="paused" value="false" />
-      <arg name="use_sim_time" value="true"/>
-      <arg name="verbose" value="true" />
+  <!-- Camera properties -->
+  <arg name="camera_pose"         default="front_facing_camera"/>
+
+  <!-- Velodyne properties - requires velodyne_simulator -->
+  <arg name="enable_velodyne"           default="false" />
+  <arg name="enable_rotating_velodyne"  default="false"/>
+  <arg name="laser_count"               default="16"/>
+  <arg name="max_range"                 default="50"/>
+
+  <!-- Collision bitmask - by default collide with everything -->
+  <arg name="collision_bitmask" default="-1" />
+
+  <!-- Spawn the world -->
+  <include file="$(find ardupilot_gazebo)/launch/empty_world.launch">
+    <arg name="paused"          value="false" />
+    <arg name="use_sim_time"    value="$(arg use_sim_time)"/>
+    <arg name="verbose"         value="true" />
+    <arg name="world_name"      value="$(arg world)" />
+    <arg name="gui"             value="$(arg gui)"/>
+    <arg name="remap_gazebo_tf" value="$(arg remap_gazebo_tf)"/>
+    <arg name="debug"           value="false" />
   </include>
-  
-  <!-- send the robot XML to param server -->
-  <param name="/$(arg name)/robot_description" command="
-    $(find xacro)/xacro --inorder '$(arg model)'
-    enable_logging:=$(arg enable_logging)
-    enable_ground_truth:=$(arg enable_ground_truth)
-    exclude_floor_link_from_collision_check:=$(arg exclude_floor_link_from_collision_check)
-    log_file:=$(arg log_file)
-    name:=$(arg name)
-    manipulator_type:=$(arg manipulator_type)
-    manipulator_tool:=$(arg manipulator_tool)
-    mount_magnet:=$(arg mount_magnet)
-    mount_magnet_with_disk:=$(arg mount_magnet_with_disk)
-    magnet_dipole_moment_z:=$(arg magnet_dipole_moment_z)"
-  />
 
-  <param name="tf_prefix" type="string" value="$(arg name)" />
+  <include file="$(find ardupilot_gazebo)/launch/spawn_ardrone.launch">
+    <arg name="name"                value="$(arg name)"/>
+    <arg name="tf_prefix"           value="$(arg tf_prefix)"/>
+    <arg name="x"                   value="$(arg x)"/>
+    <arg name="y"                   value="$(arg y)"/>
+    <arg name="z"                   value="$(arg z)"/>
+    <arg name="enable_ground_truth" value="$(arg enable_ground_truth)"/>
+    <arg name="model"               value="$(arg model)" />
+    <arg name="world"               value="$(arg world)"/>
+    <arg name="fdm_port_in"         value="$(arg fdm_port_in)"/>
+    <arg name="fdm_port_out"        value="$(arg fdm_port_out)"/>
+    <arg name="use_sim_time"        value="$(arg use_sim_time)"/>
+    <arg name="gui"                 value="$(arg gui)"/>
+    <arg name="remap_gazebo_tf"     value="$(arg remap_gazebo_tf)"/>
 
-  <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
-   args="-param /$(arg name)/robot_description
-         -urdf
-         -x $(arg x)
-         -y $(arg y)
-         -z $(arg z)
-         -model $(arg name)"
-   respawn="false" output="screen" >
-  </node>
+    <!-- Camera properties -->
+    <arg name="camera_pose"         value="$(arg camera_pose)"/>
+
+    <!-- Velodyne properties - requires velodyne_simulator -->
+    <arg name="enable_velodyne"           value="$(arg enable_velodyne)" />
+    <arg name="enable_rotating_velodyne"  value="$(arg enable_rotating_velodyne)"/>
+    <arg name="laser_count"               value="$(arg laser_count)"/>
+    <arg name="max_range"                 value="$(arg max_range)"/>
+
+  </include>
 
 </launch>
