@@ -85,7 +85,7 @@
 
   <!-- Setup regular quadrotor -->
   <xacro:unless value="${enable_tilt_rotors}">
-    <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
+    <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base_with_pole.urdf.xacro" />
   </xacro:unless>
 
   <!-- Setup tilt quadrotor -->
