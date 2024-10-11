@@ -17,6 +17,10 @@
   <xacro:property name="laser_count" value="$(arg laser_count)"/>
   <xacro:property name="camera_pose" value="$(arg camera_pose)"/>
 
+
+  <xacro:arg name="enable_force" default="false" />
+  <xacro:property name="enable_force" value="$(arg enable_force)" />
+
   <xacro:property name="enable_wind"      value="$(arg enable_wind)" />
   <xacro:property name="wind_force"       value="$(arg wind_force)" />
   <xacro:property name="wind_force_mean"  value="$(arg wind_force_mean)" />
@@ -85,7 +89,7 @@
 
   <!-- Setup regular quadrotor -->
   <xacro:unless value="${enable_tilt_rotors}">
-    <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base_with_pole.urdf.xacro" />
+    <xacro:include filename="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx_base.urdf.xacro" />
   </xacro:unless>
 
   <!-- Setup tilt quadrotor -->
@@ -226,6 +230,41 @@
     <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" /> <!-- [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] -->
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
   </xacro:odometry_plugin_macro>
+
+<!-- Mount odometry sensor on box at the pole tip-->
+  <xacro:if value="$(arg enable_force)">
+
+    <xacro:odometry_plugin_macro
+      namespace="${namespace}"
+      odometry_sensor_suffix="_ft_sensor"
+      parent_link="pole_tip"
+      pose_topic="ft_sensor_pose"
+      pose_with_covariance_topic="ft_sensor_pose_with_covariance"
+      position_topic="ft_sensor_position"
+      transform_topic="ft_sensor_transform"
+      odometry_topic="ft_sensor_odometry"
+      parent_frame_id="world"
+      child_frame_id="pole_tip"
+      mass_odometry_sensor="0.01"
+      measurement_divisor="20"
+      measurement_delay="0"
+      unknown_delay="0.0"
+      noise_normal_position="0.0 0.0 0.0"
+      noise_normal_quaternion="0.0 0.0 0.0"
+      noise_normal_linear_velocity="0.0 0.0 0.0"
+      noise_normal_angular_velocity="0.0 0.0 0.0"
+      noise_uniform_position="0.0 0.0 0.0"
+      noise_uniform_quaternion="0.0 0.0 0.0"
+      noise_uniform_linear_velocity="0.0 0.0 0.0"
+      noise_uniform_angular_velocity="0.0 0.0 0.0"
+      enable_odometry_map="false"
+      odometry_map=""
+      image_scale="">
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    </xacro:odometry_plugin_macro>
+
+  </xacro:if>
 
   <!-- Choose one of the following (and comment out the other): fixed RGBD camera or gimbal with RGBD camera. -->	
   <xacro:unless value="${enable_gimbal}">

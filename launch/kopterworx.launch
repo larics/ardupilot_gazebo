@@ -11,8 +11,11 @@
   <arg name="fdm_port_in"         default="9002"/>
   <arg name="fdm_port_out"        default="9003"/>
   <arg name="use_sim_time"        default="true"/>
-  <arg name="gui"                 default="true"/>
+  <arg name="gui"                 default="false"/>
   <arg name="remap_gazebo_tf"     default="false"/>
+
+  <!-- Force torque sensor -->
+  <arg name="enable_force"        default="false" />
 
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
@@ -72,6 +75,10 @@
     <arg name="use_sim_time"        value="$(arg use_sim_time)"/>
     <arg name="gui"                 value="$(arg gui)"/>
     <arg name="remap_gazebo_tf"     value="$(arg remap_gazebo_tf)"/>
+
+    <!-- Enable force torque sensor -->
+
+    <arg name="enable_force"     value="$(arg enable_force)"/>
 
     <!-- Camera properties -->
     <arg name="camera_pose"         value="$(arg camera_pose)"/>

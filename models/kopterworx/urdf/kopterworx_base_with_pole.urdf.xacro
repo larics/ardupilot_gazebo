@@ -2,6 +2,8 @@
 
 <robot name="kopterworx" xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <xacro:arg name="enable_sensor" default="true" /> <!-- Argument to check if pole and sensor should be included -->
+
   <!-- Math constants -->
   <xacro:property name="sin45" value="0.7071068" />
   <xacro:property name="cos45" value="0.7071068" />
@@ -25,7 +27,7 @@
   <xacro:property name="pole_mount_height" value="0.25" />  <!-- [m] -->
 
   <!-- Mass of the pole -->
-  <xacro:property name="pole_mass" value="0.1" /> <!-- [kg] -->
+  <xacro:property name="pole_mass" value="0.02" /> <!-- [kg] -->
 
   <!-- Properties of the sensor -->
   <xacro:property name="sens_len_x" value="0.15" />  <!-- [m] -->
@@ -33,7 +35,7 @@
   <xacro:property name="sens_len_z" value="0.05" />  <!-- [m] -->
 
   <!-- Mass of the sensor -->
-  <xacro:property name="sensor_mass" value="0.15" /> <!-- [kg] -->
+  <xacro:property name="sensor_mass" value="0.01" /> <!-- [kg] -->
 
   <!-- Rotor constants -->
   <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->
@@ -160,119 +162,107 @@
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
-<!-- Joint definition for attaching the pole to the base of the quadcopter -->
-
-  <joint name="$(arg namespace)/pole_base_joint" type="fixed">
+  <!-- Conditionally include pole and sensor based on the enable_sensor argument -->
+  <xacro:if value="$(arg force_sensor)">
+    <!-- Joint definition for attaching the pole to the base of the quadcopter -->
+    <joint name="$(arg namespace)/pole_base_joint" type="fixed">
       <parent link="$(arg namespace)/base_link"/>
       <child link="$(arg namespace)/pole_base"/>
       <origin xyz="${pole_length/2} 0 ${pole_mount_height}" rpy="0 1.5708 0"/>
-  </joint>
+    </joint>
 
-  <!-- Link definition for the pole -->
-  <link name="$(arg namespace)/pole_base">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${pole_length}" radius="${pole_radius}" />
-      </geometry>
-      <material name="green">
-        <color rgba="0.2 1 0.2 1"/>
-      </material>
-    </visual>
+    <!-- Link definition for the pole -->
+    <link name="$(arg namespace)/pole_base">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="${pole_length}" radius="${pole_radius}" />
+        </geometry>
+        <material name="green">
+          <color rgba="0.2 1 0.2 1"/>
+        </material>
+      </visual>
 
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="${pole_length}" radius="${pole_radius}" />
-      </geometry>
-    </collision>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="${pole_length}" radius="${pole_radius}" />
+        </geometry>
+      </collision>
 
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="${pole_mass}" />
-      <inertia 
-        ixx="${(1/12) * pole_mass * (3*pole_radius*pole_radius + pole_length*pole_length)}" 
-        ixy="0.0" 
-        ixz="0.0"
-        iyy="${(1/12) * pole_mass * (3*pole_radius*pole_radius + pole_length*pole_length)}" 
-        iyz="0.0" 
-        izz="${(1/2) * pole_mass * (pole_radius*pole_radius)}" />
-    </inertial>
-  </link>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${pole_mass}" />
+        <inertia 
+          ixx="${(1/12) * pole_mass * (3*pole_radius*pole_radius + pole_length*pole_length)}" 
+          ixy="0.0" 
+          ixz="0.0"
+          iyy="${(1/12) * pole_mass * (3*pole_radius*pole_radius + pole_length*pole_length)}" 
+          iyz="0.0" 
+          izz="${(1/2) * pole_mass * (pole_radius*pole_radius)}" />
+      </inertial>
+    </link>
 
-  <!-- Define the pole tip -->
-  <link name="pole_tip">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-      </geometry>
-      <material name="red">
-        <color rgba="1 0 0 1"/> 
-      </material>
-    </visual>
+    <!-- Define the pole tip -->
+    <link name="pole_tip">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
+        </geometry>
+        <material name="red">
+          <color rgba="1 0 0 1"/> 
+        </material>
+      </visual>
 
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-      </geometry>
-    </collision>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
+        </geometry>
+      </collision>
 
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="${sensor_mass}"/> 
-      <inertia ixx="${(1/12) * sensor_mass * (sens_len_y*sens_len_y + sens_len_z*sens_len_z)}" 
-              ixy="0.0" 
-              ixz="0.0"
-              iyy="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_z*sens_len_z)}" 
-              iyz="0.0"
-              izz="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_y*sens_len_y)}" />
-    </inertial>
-  </link>
-  <!-- End of the pole tip definition-->
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${sensor_mass}"/> 
+        <inertia ixx="${(1/12) * sensor_mass * (sens_len_y*sens_len_y + sens_len_z*sens_len_z)}" 
+                ixy="0.0" 
+                ixz="0.0"
+                iyy="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_z*sens_len_z)}" 
+                iyz="0.0"
+                izz="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_y*sens_len_y)}" />
+      </inertial>
+    </link>
 
-  <!-- Enable the Joint Feedback -->
-  <gazebo reference="$(arg namespace)/pole_tip_joint">
-    <stopCfm>0.08</stopCfm>
-    <stopErp>0.2</stopErp>
-    <implicitSpringDamper>true</implicitSpringDamper>
-    <provideFeedback>true</provideFeedback>
-  </gazebo>
-  <!-- The ft_sensor plugin -->
-  <gazebo>
-    <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
-      <updateRate>2.0</updateRate>
-      <topicName>$(arg namespace)/ft_sensor_topic</topicName>
-      <jointName>$(arg namespace)/pole_tip_joint</jointName>
-      <noise>
-          <type>gaussian</type>
-          <mean>0.0</mean>
-          <stddev>0.0001</stddev> <!-- change this to simulate noise --> 
-      </noise>
-    </plugin>
-  </gazebo>
+    <!-- Joint for attaching the force sensor to the tip of the pole -->
+    <joint name="$(arg namespace)/pole_tip_joint" type="revolute">
+      <parent link="$(arg namespace)/pole_base"/>
+      <child link="pole_tip"/>
+      <origin xyz="0 0 ${pole_length/2}" rpy="0 0 0"/>
+      <limit upper="0" lower="0" effort="10000000" velocity="0"/>
+      <axis xyz="0 0 1" />
+    </joint>
 
- <!-- Joint for attaching the force sensor to the tip of the pole -->
-  <joint name="$(arg namespace)/pole_tip_joint" type="revolute">
-    <parent link="$(arg namespace)/pole_base"/>
-    <child link="pole_tip"/>
-    <!-- Updated origin to position the sensor at the tip of the pole -->
-    <origin xyz="0 0 ${pole_length/2}" rpy="0 0 0"/>
-    <limit upper="0" lower="0" effort="10000000" velocity="0"/>
-    <axis xyz="0 0 1" />
-  </joint>
+    <!-- Enable the Joint Feedback -->
+    <gazebo reference="$(arg namespace)/pole_tip_joint">
+      <stopCfm>0.08</stopCfm>
+      <stopErp>0.2</stopErp>
+      <implicitSpringDamper>true</implicitSpringDamper>
+      <provideFeedback>true</provideFeedback>
+    </gazebo>
 
-
-  <gazebo reference="$(arg namespace)/base_link">
-    <dampingFactor>0.001</dampingFactor>
-    <collision>
-      <surface>
-        <contact>
-          <collide_bitmask>${collision_bitmask}</collide_bitmask>
-        </contact>
-      </surface>
-    </collision>
-  </gazebo>
-
+    <!-- The ft_sensor plugin -->
+    <gazebo>
+      <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
+        <updateRate>1000</updateRate>
+        <topicName>$(arg namespace)/force_sensor/sensor_readings</topicName>
+        <jointName>$(arg namespace)/pole_tip_joint</jointName>
+        <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.0001</stddev> 
+        </noise>
+      </plugin>
+    </gazebo>
+  </xacro:if>
 </robot>

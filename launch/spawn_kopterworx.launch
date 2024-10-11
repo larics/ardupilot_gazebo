@@ -14,6 +14,10 @@
   <arg name="gui"                 default="true"/>
   <arg name="remap_gazebo_tf"     default="false"/>
 
+  <!-- Force torque sensor enabling-->
+  <arg name="enable_force"        default="false" />
+
+
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
 
@@ -51,6 +55,7 @@
 	<param name="$(arg name)/robot_description" command="
 	  $(find xacro)/xacro --inorder $(arg model)
     namespace:=$(arg name)
+    enable_force:=$(arg enable_force)
     enable_velodyne:=$(arg enable_velodyne)
     enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
     enable_magnet:=$(arg enable_magnet)
