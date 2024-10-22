@@ -37,6 +37,9 @@
   <xacro:property name="sens_len_y" value="0.05" />  <!-- [m] -->
   <xacro:property name="sens_len_z" value="0.05" />  <!-- [m] -->
 
+  <!-- radus of the ball at the tip of a drone-->
+  <xacro:property name="sens_radius" value="0.05" /> <!-- [m] -->
+
   <!-- Mass of the sensor -->
   <xacro:property name="sensor_mass" value="0.01" /> <!-- [kg] -->
 
@@ -177,7 +180,11 @@
     <!-- Link definition for the pole -->
     <link name="$(arg namespace)/pole_base">
       <visual>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <!--If pole is pointing forward-->
+        <!-- <origin xyz="0 0 0" rpy="0 0 0"/> --> 
+
+        <!--If pole is pointing upward-->
+        <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
         <geometry>
           <cylinder length="${pole_length}" radius="${pole_radius}" />
         </geometry>
@@ -187,14 +194,23 @@
       </visual>
 
       <collision>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <!--If pole is pointing forward-->
+        <!--<origin xyz="0 0 0" rpy="0 0 0"/>-->
+        <!--If pole is pointing upward-->
+        <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
         <geometry>
           <cylinder length="${pole_length}" radius="${pole_radius}" />
         </geometry>
       </collision>
 
       <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
+
+        <!--If pole is pointing forward-->
+        <!--<origin xyz="0 0 0" rpy="0 0 0"/>-->
+
+        <!--If pole is pointing upward-->
+        <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>  
+
         <mass value="${pole_mass}" />
         <inertia 
           ixx="${(1/12) * pole_mass * (3*pole_radius*pole_radius + pole_length*pole_length)}" 
@@ -206,7 +222,7 @@
       </inertial>
     </link>
 
-    <!-- Define the pole tip -->
+    <!-- Define the pole tip 
     <link name="pole_tip">
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -236,12 +252,50 @@
                 izz="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_y*sens_len_y)}" />
       </inertial>
     </link>
+    -->
+
+    <link name="pole_tip">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="${sens_radius}"/> 
+        </geometry>
+        <material name="red">
+          <color rgba="1 0 0 1"/> 
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="${sens_radius}"/> 
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${sensor_mass}"/> 
+        <inertia ixx="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
+                ixy="0.0" 
+                ixz="0.0"
+                iyy="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
+                iyz="0.0"
+                izz="${(2/5) * sensor_mass * sens_radius * sens_radius}" />
+      </inertial>
+    </link>
+
 
     <!-- Joint for attaching the force sensor to the tip of the pole -->
     <joint name="$(arg namespace)/pole_tip_joint" type="revolute">
       <parent link="$(arg namespace)/pole_base"/>
       <child link="pole_tip"/>
-      <origin xyz="0 0 ${pole_length/2}" rpy="0 0 0"/>
+
+      <!-- if pole is pointing forward-->
+      <!-- <origin xyz="0 0 ${pole_length/2}" rpy="0 0 0"/> -->
+
+      <!-- if pole is pointing upward-->
+      <origin xyz="-${pole_length} 0 -${pole_length/2}" rpy="0 1.57 0"/>
+      
       <limit upper="0" lower="0" effort="10000000" velocity="0"/>
       <axis xyz="0 0 1" />
     </joint>

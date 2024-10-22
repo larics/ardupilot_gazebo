@@ -21,6 +21,15 @@
   <xacro:arg name="enable_force" default="false" />
   <xacro:property name="enable_force" value="$(arg enable_force)" />
 
+  <xacro:arg name="upward" default="true" />
+  <xacro:property name="upward" value="$(arg upward)" />
+  <xacro:arg name="forward" default="false" />
+  <xacro:property name="forward" value="$(arg forward)" />
+  <xacro:arg name="box_tip" default="false" />
+  <xacro:property name="box_tip" value="$(arg box_tip)" />
+  <xacro:arg name="sphere_tip" default="true" />
+  <xacro:property name="sphere_tip" value="$(arg sphere_tip)" />
+
   <xacro:property name="enable_wind"      value="$(arg enable_wind)" />
   <xacro:property name="wind_force"       value="$(arg wind_force)" />
   <xacro:property name="wind_force_mean"  value="$(arg wind_force_mean)" />
@@ -231,7 +240,7 @@
     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
   </xacro:odometry_plugin_macro>
 
-<!-- Mount odometry sensor on box at the pole tip-->
+<!-- Mount odometry sensor on box at the pole tip  -->
   <xacro:if value="$(arg enable_force)">
 
     <xacro:odometry_plugin_macro
@@ -263,8 +272,9 @@
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
     </xacro:odometry_plugin_macro>
-
   </xacro:if>
+
+
 
   <!-- Choose one of the following (and comment out the other): fixed RGBD camera or gimbal with RGBD camera. -->	
   <xacro:unless value="${enable_gimbal}">
