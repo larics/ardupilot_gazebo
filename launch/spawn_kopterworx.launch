@@ -17,6 +17,11 @@
   <!-- Force torque sensor enabling-->
   <arg name="enable_force"        default="false" />
 
+  <arg name="x_axis"              default="false" />
+  <arg name="z_axis"              default="true" />
+  <arg name="sphere_tip"          default="false" />
+  <arg name="box_tip"             default="true" />
+
 
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
@@ -56,6 +61,10 @@
 	  $(find xacro)/xacro --inorder $(arg model)
     namespace:=$(arg name)
     enable_force:=$(arg enable_force)
+    x_axis:=$(arg x_axis)
+    z_axis:=$(arg z_axis)
+    sphere_tip:=$(arg sphere_tip)
+    box_tip:=$(arg box_tip)
     enable_velodyne:=$(arg enable_velodyne)
     enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
     enable_magnet:=$(arg enable_magnet)

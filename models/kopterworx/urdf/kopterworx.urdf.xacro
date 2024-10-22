@@ -17,18 +17,21 @@
   <xacro:property name="laser_count" value="$(arg laser_count)"/>
   <xacro:property name="camera_pose" value="$(arg camera_pose)"/>
 
-
+  <!--Enable force sensor-->
   <xacro:arg name="enable_force" default="false" />
   <xacro:property name="enable_force" value="$(arg enable_force)" />
 
-  <xacro:arg name="upward" default="true" />
-  <xacro:property name="upward" value="$(arg upward)" />
-  <xacro:arg name="forward" default="false" />
-  <xacro:property name="forward" value="$(arg forward)" />
+  <!--Configuration of force sensor end effector-->
+  <!--
+  <xacro:arg name="x_axis" default="true" />
+  <xacro:property name="x_axis" value="$(arg x_axis)" />
+  <xacro:arg name="z_axis" default="false" />
+  <xacro:property name="z_axis" value="$(arg z_axis)" />
   <xacro:arg name="box_tip" default="false" />
   <xacro:property name="box_tip" value="$(arg box_tip)" />
   <xacro:arg name="sphere_tip" default="true" />
   <xacro:property name="sphere_tip" value="$(arg sphere_tip)" />
+  -->
 
   <xacro:property name="enable_wind"      value="$(arg enable_wind)" />
   <xacro:property name="wind_force"       value="$(arg wind_force)" />

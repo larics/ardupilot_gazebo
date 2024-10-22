@@ -17,6 +17,11 @@
   <!-- Force torque sensor -->
   <arg name="enable_force"        default="false" />
 
+  <arg name="x_axis"              default="false" />
+  <arg name="z_axis"              default="true" />
+  <arg name="sphere_tip"          default="false" />
+  <arg name="box_tip"             default="true" />
+
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
 
@@ -77,8 +82,13 @@
     <arg name="remap_gazebo_tf"     value="$(arg remap_gazebo_tf)"/>
 
     <!-- Enable force torque sensor -->
-
     <arg name="enable_force"     value="$(arg enable_force)"/>
+
+    <!-- Define configuration-->
+    <arg name="x_axis"              default="$(arg x_axis)" />
+    <arg name="z_axis"              default="$(arg z_axis)" />
+    <arg name="sphere_tip"          default="$(arg sphere_tip)" />
+    <arg name="box_tip"             default="$(arg box_tip)" />
 
     <!-- Camera properties -->
     <arg name="camera_pose"         value="$(arg camera_pose)"/>

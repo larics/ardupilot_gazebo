@@ -7,6 +7,18 @@
   <xacro:arg name="enable_force" default="false" />
   <xacro:property name="enable_force" value="$(arg enable_force)" />
 
+  <!-- Pole tip shape-->
+  <xacro:arg name="box_tip" default="false" />
+  <xacro:property name="box_tip" value="$(arg box_tip)" />
+  <xacro:arg name="sphere_tip" default="false" />
+  <xacro:property name="sphere_tip" value="$(arg sphere_tip)" />
+
+  <!-- Pole tip direction-->
+  <xacro:arg name="x_axis" default="false" />
+  <xacro:property name="x_axis" value="$(arg x_axis)" />
+  <xacro:arg name="z_axis" default="false" />
+  <xacro:property name="z_axis" value="$(arg z_axis)" />
+
   <!-- Math constants -->
   <xacro:property name="sin45" value="0.7071068" />
   <xacro:property name="cos45" value="0.7071068" />
@@ -180,11 +192,13 @@
     <!-- Link definition for the pole -->
     <link name="$(arg namespace)/pole_base">
       <visual>
-        <!--If pole is pointing forward-->
-        <!-- <origin xyz="0 0 0" rpy="0 0 0"/> --> 
 
-        <!--If pole is pointing upward-->
-        <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+        <xacro:if value="$(arg x_axis)">
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:if>
+        <xacro:if value="$(arg z_axis)">
+          <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+        </xacro:if>
         <geometry>
           <cylinder length="${pole_length}" radius="${pole_radius}" />
         </geometry>
@@ -194,22 +208,24 @@
       </visual>
 
       <collision>
-        <!--If pole is pointing forward-->
-        <!--<origin xyz="0 0 0" rpy="0 0 0"/>-->
-        <!--If pole is pointing upward-->
-        <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+        <xacro:if value="$(arg x_axis)">
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:if>
+        <xacro:if value="$(arg z_axis)">
+          <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+        </xacro:if>
         <geometry>
           <cylinder length="${pole_length}" radius="${pole_radius}" />
         </geometry>
       </collision>
 
       <inertial>
-
-        <!--If pole is pointing forward-->
-        <!--<origin xyz="0 0 0" rpy="0 0 0"/>-->
-
-        <!--If pole is pointing upward-->
-        <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>  
+        <xacro:if value="$(arg x_axis)">
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+        </xacro:if>
+        <xacro:if value="$(arg z_axis)">
+          <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+        </xacro:if>
 
         <mass value="${pole_mass}" />
         <inertia 
@@ -222,67 +238,69 @@
       </inertial>
     </link>
 
-    <!-- Define the pole tip 
-    <link name="pole_tip">
-      <visual>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-        </geometry>
-        <material name="red">
-          <color rgba="1 0 0 1"/> 
-        </material>
-      </visual>
+    <xacro:if value="$(arg box_tip)">
+      <link name="pole_tip">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
+          </geometry>
+          <material name="red">
+            <color rgba="1 0 0 1"/> 
+          </material>
+        </visual>
 
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-        </geometry>
-      </collision>
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
+          </geometry>
+        </collision>
 
-      <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <mass value="${sensor_mass}"/> 
-        <inertia ixx="${(1/12) * sensor_mass * (sens_len_y*sens_len_y + sens_len_z*sens_len_z)}" 
-                ixy="0.0" 
-                ixz="0.0"
-                iyy="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_z*sens_len_z)}" 
-                iyz="0.0"
-                izz="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_y*sens_len_y)}" />
-      </inertial>
-    </link>
-    -->
+        <inertial>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <mass value="${sensor_mass}"/> 
+          <inertia ixx="${(1/12) * sensor_mass * (sens_len_y*sens_len_y + sens_len_z*sens_len_z)}" 
+                  ixy="0.0" 
+                  ixz="0.0"
+                  iyy="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_z*sens_len_z)}" 
+                  iyz="0.0"
+                  izz="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_y*sens_len_y)}" />
+        </inertial>
+      </link>
+    </xacro:if>
 
-    <link name="pole_tip">
-      <visual>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <sphere radius="${sens_radius}"/> 
-        </geometry>
-        <material name="red">
-          <color rgba="1 0 0 1"/> 
-        </material>
-      </visual>
+    <xacro:if value="$(arg sphere_tip)">
+      <link name="pole_tip">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <sphere radius="${sens_radius}"/> 
+          </geometry>
+          <material name="red">
+            <color rgba="1 0 0 1"/> 
+          </material>
+        </visual>
 
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <sphere radius="${sens_radius}"/> 
-        </geometry>
-      </collision>
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>
+            <sphere radius="${sens_radius}"/> 
+          </geometry>
+        </collision>
 
-      <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <mass value="${sensor_mass}"/> 
-        <inertia ixx="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
-                ixy="0.0" 
-                ixz="0.0"
-                iyy="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
-                iyz="0.0"
-                izz="${(2/5) * sensor_mass * sens_radius * sens_radius}" />
-      </inertial>
-    </link>
+        <inertial>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <mass value="${sensor_mass}"/> 
+          <inertia ixx="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
+                  ixy="0.0" 
+                  ixz="0.0"
+                  iyy="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
+                  iyz="0.0"
+                  izz="${(2/5) * sensor_mass * sens_radius * sens_radius}" />
+        </inertial>
+      </link>
+    </xacro:if>
 
 
     <!-- Joint for attaching the force sensor to the tip of the pole -->
@@ -290,11 +308,12 @@
       <parent link="$(arg namespace)/pole_base"/>
       <child link="pole_tip"/>
 
-      <!-- if pole is pointing forward-->
-      <!-- <origin xyz="0 0 ${pole_length/2}" rpy="0 0 0"/> -->
-
-      <!-- if pole is pointing upward-->
-      <origin xyz="-${pole_length} 0 -${pole_length/2}" rpy="0 1.57 0"/>
+      <xacro:if value="$(arg x_axis)">
+          <origin xyz="0 0 ${pole_length/2}" rpy="0 0 0"/>
+      </xacro:if>
+      <xacro:if value="$(arg z_axis)">
+          <origin xyz="-${pole_length} 0 -${pole_length/2}" rpy="0 1.57 0"/>
+      </xacro:if>
       
       <limit upper="0" lower="0" effort="10000000" velocity="0"/>
       <axis xyz="0 0 1" />
