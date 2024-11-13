@@ -10,8 +10,10 @@
   <!-- Pole tip shape-->
   <xacro:arg name="box_tip" default="false" />
   <xacro:property name="box_tip" value="$(arg box_tip)" />
-  <xacro:arg name="sphere_tip" default="false" />
+  <xacro:arg name="sphere_tip" default="true" />
   <xacro:property name="sphere_tip" value="$(arg sphere_tip)" />
+  <xacro:arg name="cylinder_tip" default="false" />
+  <xacro:property name="cylinder_tip" value="$(arg cylinder_tip)" />
 
   <!-- Pole tip direction-->
   <xacro:arg name="x_axis" default="false" />
@@ -38,7 +40,7 @@
 
   <!-- Properties of the pole -->
   <xacro:property name="pole_radius" value="0.01" />  <!-- [m] -->
-  <xacro:property name="pole_length" value="2.0" />  <!-- [m] -->
+  <xacro:property name="pole_length" value="0.20" />  <!-- [m] -->
   <xacro:property name="pole_mount_height" value="0.25" />  <!-- [m] -->
 
   <!-- Mass of the pole -->
@@ -51,6 +53,10 @@
 
   <!-- radus of the ball at the tip of a drone-->
   <xacro:property name="sens_radius" value="0.05" /> <!-- [m] -->
+
+  <!-- Radius and height for the cylinder tip -->
+  <xacro:property name="sens_cylinder_height" value="0.1" /> <!-- [m] -->
+  <xacro:property name="sens_cylinder_radius" value="0.0045" /> <!-- [m] -->
 
   <!-- Mass of the sensor -->
   <xacro:property name="sensor_mass" value="0.01" /> <!-- [kg] -->
@@ -270,6 +276,98 @@
       </link>
     </xacro:if>
 
+    <xacro:if value="$(arg cylinder_tip)">
+      <link name="pole_tip">
+
+      <!-- First cylinder-->
+        <visual>
+          <origin xyz="0 0 0" rpy="0.0  -0.78539816339 0"/>
+          <geometry>
+            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
+          </geometry>
+          <material name="red">
+            <color rgba="1 0 0 1"/> 
+          </material>
+        </visual>
+
+        <collision>
+          <origin xyz="0 0 0" rpy="0.0  -0.78539816339 0"/>
+          <geometry>
+            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
+          </geometry>
+        </collision>
+
+        <inertial>
+          <origin xyz="0 0 0" rpy="0.0  -0.78539816339 0"/>
+          <mass value="${sensor_mass}"/> 
+          <inertia ixx="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
+                  ixy="0.0" 
+                  ixz="0.0"
+                  iyy="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
+                  iyz="0.0"
+                  izz="${(1/2) * sensor_mass * (sens_cylinder_radius*sens_cylinder_radius)}" />
+        </inertial>
+
+       <!-- Second cylinder-->
+        <visual>
+          <origin xyz="0 0 0" rpy="0.78539816339  0.78539816339 0"/>
+          <geometry>
+            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
+          </geometry>
+          <material name="red">
+            <color rgba="1 0 0 1"/> 
+          </material>
+        </visual>
+
+        <collision>
+          <origin xyz="0 0 0" rpy="0.78539816339  0.78539816339 0"/>
+          <geometry>
+            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
+          </geometry>
+        </collision>
+
+        <inertial>
+          <origin xyz="0 0 0" rpy="0.78539816339  0.78539816339 0"/>
+          <mass value="${sensor_mass}"/> 
+          <inertia ixx="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
+                  ixy="0.0" 
+                  ixz="0.0"
+                  iyy="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
+                  iyz="0.0"
+                  izz="${(1/2) * sensor_mass * (sens_cylinder_radius*sens_cylinder_radius)}" />
+        </inertial>
+
+      <!-- Third cylinder-->
+        <visual>
+          <origin xyz="0 0 0" rpy="2.35619449019   0.78539816339 0"/>
+          <geometry>
+            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
+          </geometry>
+          <material name="red">
+            <color rgba="1 0 0 1"/> 
+          </material>
+        </visual>
+
+        <collision>
+          <origin xyz="0 0 0" rpy="02.35619449019   0.78539816339 0"/>
+          <geometry>
+            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
+          </geometry>
+        </collision>
+
+        <inertial>
+          <origin xyz="0 0 0" rpy="02.35619449019   0.78539816339 0"/>
+          <mass value="${sensor_mass}"/> 
+          <inertia ixx="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
+                  ixy="0.0" 
+                  ixz="0.0"
+                  iyy="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
+                  iyz="0.0"
+                  izz="${(1/2) * sensor_mass * (sens_cylinder_radius*sens_cylinder_radius)}" />
+        </inertial>
+      </link>
+    </xacro:if>
+
     <xacro:if value="$(arg sphere_tip)">
       <link name="pole_tip">
         <visual>
@@ -301,7 +399,6 @@
         </inertial>
       </link>
     </xacro:if>
-
 
     <!-- Joint for attaching the force sensor to the tip of the pole -->
     <joint name="$(arg namespace)/pole_tip_joint" type="revolute">

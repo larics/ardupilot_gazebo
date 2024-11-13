@@ -35,7 +35,7 @@
   <xacro:property name="sens_len_z" value="0.05" />  <!-- [m] -->
 
   <!-- Mass of the sensor -->
-  <xacro:property name="sensor_mass" value="0.01" /> <!-- [kg] -->
+  <xacro:property name="sensor_mass" value="0.00001" /> <!-- [kg] -->
 
   <!-- Rotor constants -->
   <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->

@@ -20,7 +20,8 @@
   <arg name="x_axis"              default="false" />
   <arg name="z_axis"              default="true" />
   <arg name="sphere_tip"          default="false" />
-  <arg name="box_tip"             default="true" />
+  <arg name="box_tip"             default="false" />
+  <arg name="cylinder_tip"        default="false" />
 
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
@@ -89,6 +90,8 @@
     <arg name="z_axis"              default="$(arg z_axis)" />
     <arg name="sphere_tip"          default="$(arg sphere_tip)" />
     <arg name="box_tip"             default="$(arg box_tip)" />
+    <arg name="cylinder_tip"        default="$(arg cylinder_tip)" />
+    
 
     <!-- Camera properties -->
     <arg name="camera_pose"         value="$(arg camera_pose)"/>

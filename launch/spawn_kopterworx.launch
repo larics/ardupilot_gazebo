@@ -21,7 +21,7 @@
   <arg name="z_axis"              default="true" />
   <arg name="sphere_tip"          default="false" />
   <arg name="box_tip"             default="true" />
-
+  <arg name="cylinder_tip"         default="false" />
 
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
@@ -65,6 +65,7 @@
     z_axis:=$(arg z_axis)
     sphere_tip:=$(arg sphere_tip)
     box_tip:=$(arg box_tip)
+    cylinder_tip:=$(arg cylinder_tip)
     enable_velodyne:=$(arg enable_velodyne)
     enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
     enable_magnet:=$(arg enable_magnet)
