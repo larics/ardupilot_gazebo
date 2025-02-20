@@ -2,7 +2,7 @@
 
 <robot name="new_order_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
 
-    <xacro:include filename="$(find ardupilot_gazebo)/manipulator/urdf/new_order_manipulator_base.urdf.xacro" />
+    <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/new_order_manipulator.base.urdf.xacro" />
 
     <!-- When I set this to world, manipulator is fixed --> 
     <xacro:arg name="parent" default="base_link"/>
@@ -11,34 +11,35 @@
     <link name="world"></link>
 
     <xacro:new_order_manipulator
-        parent="world">
+        parent="world"
+        name="red/manipulator">
         <origin xyz="0 0 0" rpy="0 0 0"/>
     </xacro:new_order_manipulator>
     
     <!-- Joint transmissions -->  
     <xacro:joint_transmission
         trans_number="1"
-        joint_name="joint1">
+        joint_name="arm_joint1">
     </xacro:joint_transmission>
 
     <xacro:joint_transmission
         trans_number="2"
-        joint_name="joint2">
+        joint_name="arm_joint2">
     </xacro:joint_transmission>
 
     <xacro:joint_transmission
         trans_number="3"
-        joint_name="joint3">
+        joint_name="arm_joint3">
     </xacro:joint_transmission>
 
     <xacro:joint_transmission
         trans_number="4"
-        joint_name="joint4">
+        joint_name="arm_joint4">
     </xacro:joint_transmission>
 
     <xacro:joint_transmission
         trans_number="5"
-        joint_name="joint5">
+        joint_name="arm_joint5">
     </xacro:joint_transmission>
 
     <!-- Add gazebo control -->

@@ -116,10 +116,10 @@
 
 	<xacro:if value="${enable_manipulator}">
 		<!-- Include URDF files -->
-		<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/new_order_manipulator.base.urdf.xacro" />
+		<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/new_order_manipulator.urdf.xacro" />
 		<!-- Instantiate aerial manipulator -->
 		<xacro:new_order_manipulator
-			name="$(arg namespace)"
+			name="$(arg namespace)/manipulator"
 			gazebo="true"
 			parent="$(arg namespace)/base_link">
 			<origin xyz="0 0 ${arm_offset_z}" rpy="0 0 -${pi/2}"/>
