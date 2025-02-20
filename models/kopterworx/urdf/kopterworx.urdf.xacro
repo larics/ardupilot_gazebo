@@ -116,14 +116,14 @@
 
 	<xacro:if value="${enable_manipulator}">
 		<!-- Include URDF files -->
-		<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/asap_manipulator.base.urdf.xacro" />
+		<xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/new_order_manipulator.base.urdf.xacro" />
 		<!-- Instantiate aerial manipulator -->
-		<xacro:manipulator
-			namespace="$(arg namespace)"
+		<xacro:new_order_manipulator
+			name="$(arg namespace)"
 			gazebo="true"
 			parent="$(arg namespace)/base_link">
-			<origin xyz="0 0 ${arm_offset_z}" rpy="-${pi/2} 0 0"/>
-		</xacro:manipulator>
+			<origin xyz="0 0 ${arm_offset_z}" rpy="0 0 -${pi/2}"/>
+		</xacro:new_order_manipulator>
 	</xacro:if>
 
 	<!-- Realistic odometry sensor with noise -->

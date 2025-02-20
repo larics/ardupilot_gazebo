@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 
-<robot name="wp_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="new_order_manipulator" xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- NOTE: It is important how this xacro is named! -->
-  <xacro:macro name="manipulator" params="name parent gazebo *origin">
+  <xacro:macro name="new_order_manipulator" params="name parent gazebo *origin">
 
-    <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/manipulator_base.urdf.xacro" />
+    <xacro:include filename="$(find ardupilot_gazebo)/models/manipulator/urdf/new_order_manipulator_base.urdf.xacro" />
 
-    <xacro:manipulator
+    <xacro:new_order_manipulator
       parent="${parent}">
       <xacro:insert_block name="origin" />
-    </xacro:manipulator>
+    </xacro:new_order_manipulator>
      
     <!-- Joint transmissions -->  
     <xacro:joint_transmission
@@ -33,10 +33,10 @@
         joint_name="joint4">
     </xacro:joint_transmission>
 
-    <!--xacro:joint_transmission
-        trans_number="5"
+    <xacro:joint_transmission
+        trans_number="4"
         joint_name="joint5">
-    </xacro:joint_transmission-->
+    </xacro:joint_transmission>
 
     <xacro:if value="${gazebo}">
       <gazebo>

@@ -34,7 +34,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/base.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/base.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -53,7 +53,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link1.dae"
+          <mesh filename="package://aardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link1.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -72,7 +72,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 -${pi / 2}" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link2.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link2.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -92,7 +92,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi / 2} ${-pi / 2}" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link3.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/wp_manipulator/link3.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -111,7 +111,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi / 2} -${pi / 2}" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link4.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link4.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -130,7 +130,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi / 2} 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link5.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link5.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -242,7 +242,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 -${pi / 2}" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link2.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link2.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -261,7 +261,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi / 2} ${-pi / 2}" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link3.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link3.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -280,7 +280,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi / 2} -${pi / 2}" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link4.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link4.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -299,7 +299,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi / 2} 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link5.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link5.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -393,7 +393,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/base.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/base.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -412,7 +412,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link2_rotated.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link2_rotated.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -431,7 +431,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi/2} ${-pi/2}" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link4.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link4.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -450,7 +450,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 ${pi / 2} 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/wp_manipulator/link5.dae"
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link5.dae"
             scale="1 1 1" />
         </geometry>
       </visual>
@@ -524,7 +524,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/base_link.dae" scale="1 1 1"/>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/base_link.dae" scale="1 1 1"/>
         </geometry>
       </visual>
     </link>
@@ -539,7 +539,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link1.dae" scale="1 1 1"/>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link1.dae" scale="1 1 1"/>
         </geometry>
       </visual>
     </link>
@@ -554,7 +554,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link2.dae" scale="1 1 1"/>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link2.dae" scale="1 1 1"/>
         </geometry>
       </visual>
     </link>
@@ -569,7 +569,7 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link3.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link3.dae" scale="1 1 1"/>
        </geometry>
       </visual>
     </link>
@@ -584,7 +584,7 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link4.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link4.dae" scale="1 1 1"/>
        </geometry>
       </visual>
     </link>
@@ -599,7 +599,7 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link5.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link5.dae" scale="1 1 1"/>
        </geometry>
       </visual>
     </link>
@@ -689,14 +689,14 @@
       <visual>
         <origin rpy="${pi/2} ${pi} 0" xyz="0.17955 0.0 0.0"/>
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link2.dae" scale="1 1 1"/>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link2.dae" scale="1 1 1"/>
         </geometry>
       </visual>
 
       <collision>
         <origin rpy="${pi/2} ${pi} 0" xyz="0.17955 0.0 0.0"/>
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link2.dae" scale="0.9 0.9 0.9"/>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link2.dae" scale="0.9 0.9 0.9"/>
         </geometry>
       </collision>
       
@@ -712,14 +712,14 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link3.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link3.dae" scale="1 1 1"/>
        </geometry>
       </visual>
 
       <!--collision>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link3.dae" scale="0.9 0.9 0.9"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link3.dae" scale="0.9 0.9 0.9"/>
        </geometry>
       </collision-->
 
@@ -735,14 +735,14 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link4.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link4.dae" scale="1 1 1"/>
        </geometry>
       </visual>
 
       <!--collision>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link4.dae" scale="0.9 0.9 0.9"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link4.dae" scale="0.9 0.9 0.9"/>
        </geometry>
       </collision-->
     </link>
@@ -757,14 +757,14 @@
       <visual>
        <origin rpy="${pi} ${pi} 0" xyz="0.048 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link5.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link5.dae" scale="1 1 1"/>
        </geometry>
       </visual>
       
       <!--collision>
        <origin rpy="${pi} ${pi} 0" xyz="0.048 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link5.dae" scale="0.9 0.9 0.9"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link5.dae" scale="0.9 0.9 0.9"/>
        </geometry>
       </collision-->
     </link>
@@ -864,7 +864,7 @@
       <visual>
         <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
         <geometry>
-          <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link2.dae" scale="1 1 1"/>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link2.dae" scale="1 1 1"/>
         </geometry>
       </visual>
     </link>
@@ -879,7 +879,7 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link3.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link3.dae" scale="1 1 1"/>
        </geometry>
       </visual>
     </link>
@@ -894,7 +894,7 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link4.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link4.dae" scale="1 1 1"/>
        </geometry>
       </visual>
     </link>
@@ -909,7 +909,7 @@
       <visual>
        <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
        <geometry>
-         <mesh filename="package://aerial_manipulators_description/meshes/asap_manipulator/link5.dae" scale="1 1 1"/>
+         <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/asap_manipulator/link5.dae" scale="1 1 1"/>
        </geometry>
       </visual>
     </link>
