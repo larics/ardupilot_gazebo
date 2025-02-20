@@ -38,6 +38,14 @@
             scale="1 1 1" />
         </geometry>
       </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link0.dae"
+            scale="0.8 0.8 0.8" />
+        </geometry>
+      </collision>
     </link>
 
     <link name='link1'>
@@ -57,6 +65,14 @@
             scale="1 1 1" />
         </geometry>
       </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link1.dae"
+            scale="0.8 0.8 0.8" />
+        </geometry>
+      </collision>
     </link>
 
     <link name='link2'>
@@ -76,6 +92,14 @@
             scale="1 1 1" />
         </geometry>
       </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 -${pi / 2}" />
+        <geometry>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link2.dae"
+            scale="0.8 0.8 0.8" />
+        </geometry>
+      </collision>
     </link>
 
     <link name='link3'>
@@ -95,6 +119,14 @@
             scale="1 1 1" />
         </geometry>
       </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${pi / 2} ${-pi / 2}" />
+        <geometry>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link3.dae"
+            scale="0.5 0.5 0.5" />
+        </geometry>
+      </collision>
     </link>
 
     <link name='link4'>
@@ -114,6 +146,14 @@
             scale="1 1 1" />
         </geometry>
       </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${pi / 2} -${pi / 2}" />
+        <geometry>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link4.dae"
+            scale="0.5 0.5 0.5" />
+        </geometry>
+      </collision>
     </link>
 
     <link name='link5'>
@@ -133,6 +173,14 @@
             scale="1 1 1" />
         </geometry>
       </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${pi / 2} 0" />
+        <geometry>
+          <mesh filename="package://ardupilot_gazebo/models/manipulator/meshes/wp_manipulator/link5.dae"
+            scale="0.5 0.5 0.5" />
+        </geometry>
+      </collision>
     </link>
 
     <link name='end_effector_base'>
