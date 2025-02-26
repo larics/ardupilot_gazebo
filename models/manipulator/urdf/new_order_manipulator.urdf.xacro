@@ -39,13 +39,13 @@
         joint_name="arm_joint5">
     </xacro:joint_transmission>
 
-    <!--xacro:if value="${gazebo}">
+    <xacro:if value="${gazebo}">
       <gazebo>
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
             <robotNamespace>"${namespace}/manipulator"</robotNamespace>
         </plugin>
       </gazebo>
-    </xacro:if-->
+    </xacro:if>
 
   </xacro:macro>
 
