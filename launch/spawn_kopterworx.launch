@@ -16,6 +16,7 @@
 
   <!-- Force torque sensor enabling-->
   <arg name="enable_force"        default="false" />
+  <arg name="pole_length"         default="0.2" />
 
   <arg name="x_axis"              default="false" />
   <arg name="z_axis"              default="true" />
@@ -66,6 +67,7 @@
     sphere_tip:=$(arg sphere_tip)
     box_tip:=$(arg box_tip)
     cylinder_tip:=$(arg cylinder_tip)
+    pole_length:=$(arg pole_length)
     enable_velodyne:=$(arg enable_velodyne)
     enable_rotating_velodyne:=$(arg enable_rotating_velodyne)
     enable_magnet:=$(arg enable_magnet)

@@ -255,7 +255,7 @@
       position_topic="ft_sensor_position"
       transform_topic="ft_sensor_transform"
       odometry_topic="ft_sensor_odometry"
-      parent_frame_id="world"
+      parent_frame_id="${namespace}/base_link"
       child_frame_id="pole_tip"
       mass_odometry_sensor="0.01"
       measurement_divisor="20"

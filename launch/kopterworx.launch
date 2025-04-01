@@ -17,6 +17,8 @@
   <!-- Force torque sensor -->
   <arg name="enable_force"        default="false" />
 
+  <arg name="pole_length"        default="0.80" />
+
   <arg name="x_axis"              default="false" />
   <arg name="z_axis"              default="true" />
   <arg name="sphere_tip"          default="false" />
@@ -84,6 +86,7 @@
 
     <!-- Enable force torque sensor -->
     <arg name="enable_force"     value="$(arg enable_force)"/>
+    <arg name="pole_length"      value="$(arg pole_length)" />
 
     <!-- Define configuration-->
     <arg name="x_axis"              default="$(arg x_axis)" />
