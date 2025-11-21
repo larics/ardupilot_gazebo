@@ -204,35 +204,44 @@
     </link>
 
     <!-- Define the pole tip -->
-    <link name="pole_tip">
-      <visual>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-        </geometry>
-        <material name="red">
-          <color rgba="1 0 0 1"/> 
-        </material>
-      </visual>
+    <!-- Define the pole tip -->
+  <link name="pole_tip">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.02"/> <!-- changed from box to sphere -->
+      </geometry>
+      <material name="red">
+        <color rgba="1 0 0 1"/> 
+      </material>
+    </visual>
 
-      <collision>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>
-          <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-        </geometry>
-      </collision>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.02"/> <!-- same sphere for collision -->
+      </geometry>
+    </collision>
 
-      <inertial>
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <mass value="${sensor_mass}"/> 
-        <inertia ixx="${(1/12) * sensor_mass * (sens_len_y*sens_len_y + sens_len_z*sens_len_z)}" 
-                ixy="0.0" 
-                ixz="0.0"
-                iyy="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_z*sens_len_z)}" 
-                iyz="0.0"
-                izz="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_y*sens_len_y)}" />
-      </inertial>
-    </link>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="${sensor_mass}"/> 
+      <inertia ixx="${(2/5) * sensor_mass * (0.02*0.02)}"
+              iyy="${(2/5) * sensor_mass * (0.02*0.02)}"
+              izz="${(2/5) * sensor_mass * (0.02*0.02)}"
+              ixy="0.0" ixz="0.0" iyz="0.0"/>
+    </inertial>
+  </link>
+
+  <!-- Add Gazebo friction properties -->
+  <!--gazebo reference="pole_tip">
+    <mu1>0.9</mu1>     
+    <mu2>0.9</mu2>     
+    <kp>10</kp>    
+    <kd>500</kd>    
+    <fdir1>1 0 0</fdir1>
+  </gazebo-->
+
 
     <!-- Joint for attaching the force sensor to the tip of the pole -->
     <joint name="$(arg namespace)/pole_tip_joint" type="revolute">

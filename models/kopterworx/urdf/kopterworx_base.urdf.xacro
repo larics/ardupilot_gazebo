@@ -1,13 +1,12 @@
 <?xml version="1.0"?>
 
-<robot name="kopterworx" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="kopterworx_gummy" xmlns:xacro="http://ros.org/wiki/xacro">
 
-
-  <!-- Force sensor -->
-  <xacro:arg name="enable_force" default="false" />
+  <!-- Force sensor (enabled by default for gummy effectors) -->
+  <xacro:arg name="enable_force" default="true" />
   <xacro:property name="enable_force" value="$(arg enable_force)" />
 
-  <!-- Pole tip shape-->
+  <!-- Pole tip shape - sphere optimized for soft contact -->
   <xacro:arg name="box_tip" default="false" />
   <xacro:property name="box_tip" value="$(arg box_tip)" />
   <xacro:arg name="sphere_tip" default="true" />
@@ -38,29 +37,34 @@
   <xacro:property name="rotor_y_offset" value="${arm_length*sin45}" /> <!-- [m] -->
   <xacro:property name="rotor_offset_top" value="0.115" /> <!-- [m] -->
 
-  <!-- Properties of the pole -->
+  <!-- Properties of the main pole -->
   <xacro:property name="pole_radius" value="0.01" />  <!-- [m] -->
   <xacro:arg name="pole_length" default="0.8" />  <!-- [m] -->
   <xacro:property name="pole_length" value="$(arg pole_length)" />  
   <xacro:property name="pole_mount_height" value="0.25" />  <!-- [m] -->
 
+  <!-- Properties of the branch poles (left and right) -->
+  <xacro:property name="branch_pole_length" value="0.3" />  <!-- [m] -->
+  <xacro:property name="pole_separation" value="0.4" />  <!-- [m] - 40cm separation between left and right tips -->
+  <xacro:property name="branch_offset" value="0.2" />  <!-- [m] - half of separation, for positioning left/right branches -->
+
   <!-- Mass of the pole -->
   <xacro:property name="pole_mass" value="0.02" /> <!-- [kg] -->
+  <xacro:property name="branch_mass" value="0.01" /> <!-- [kg] -->
 
-  <!-- Properties of the sensor -->
-  <xacro:property name="sens_len_x" value="0.13" />  <!-- [m] -->
-  <xacro:property name="sens_len_y" value="0.05" />  <!-- [m] -->
-  <xacro:property name="sens_len_z" value="0.1" />  <!-- [m] -->
+  <!-- Properties of GUMMY/SOFT sensor end effector -->
+  <!-- Single soft sphere - unified deformable contact -->
+  <xacro:property name="gummy_sphere_radius" value="0.05" /> <!-- [m] - main soft gummy sphere -->
+  <xacro:property name="gummy_sphere_mass" value="0.015" /> <!-- [kg] - soft material mass -->
 
-  <!-- radus of the ball at the tip of a drone-->
-  <xacro:property name="sens_radius" value="0.05" /> <!-- [m] -->
-
-  <!-- Radius and height for the cylinder tip -->
-  <xacro:property name="sens_cylinder_height" value="0.1" /> <!-- [m] -->
-  <xacro:property name="sens_cylinder_radius" value="0.0045" /> <!-- [m] -->
-
-  <!-- Mass of the sensor -->
-  <xacro:property name="sensor_mass" value="0.01" /> <!-- [kg] -->
+  <!-- Contact/Material properties for gummy (soft, compliant) -->
+  <xacro:property name="gummy_friction" value="0.4" /> <!-- Moderate friction for grip -->
+  <xacro:property name="gummy_restitution" value="0.05" /> <!-- Very low bounce (soft material) -->
+  
+  <!-- Soft contact damping/stiffness (Gazebo ODE parameters) -->
+  <!-- Low stiffness = more deformation, higher damping = dissipates energy -->
+  <xacro:property name="gummy_contact_cfm" value="0.001" /> <!-- Constraint force mixing - higher = softer -->
+  <xacro:property name="gummy_contact_erp" value="0.08" /> <!-- Error reduction parameter - lower = softer response -->
 
   <!-- Rotor constants -->
   <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->
@@ -73,7 +77,7 @@
   <xacro:property name="rotor_drag_coefficient" value="8.06428e-05" />
   <xacro:property name="rolling_moment_coefficient" value="0.000001" />
 
-  <!-- Collision bitmask - By default collides with everything -->
+  <!-- Collision bitmask -->
   <xacro:arg name="collision_bitmask" default="-1" />
   <xacro:property name="collision_bitmask" value="$(arg collision_bitmask)" />
 
@@ -82,7 +86,7 @@
     <inertia ixx="0.303755" ixy="0.0004484919" ixz="0.0010159727" iyy="0.27722" iyz="-0.001806885" izz="0.469164" />
   </xacro:property>
 
-  <!-- inertia of a single rotor, assuming it is a cuboid. Height=3mm, width=15mm -->
+  <!-- inertia of a single rotor -->
   <xacro:property name="rotor_inertia">
     <xacro:box_inertia x="${radius_rotor}" y="0.015" z="0.003" mass="${mass_rotor*rotor_velocity_slowdown_sim}" />
   </xacro:property>
@@ -187,24 +191,28 @@
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
-  <!-- Conditionally include pole and sensor based on the argument -->
+  <!-- ============================================================================ -->
+  <!-- GUMMY END EFFECTORS WITH FORCE SENSING - T MANIPULATOR -->
+  <!-- FINAL FIX: Right sensor uses Y-axis to ensure consistent positive measurements -->
+  <!-- ============================================================================ -->
+  
   <xacro:if value="$(arg enable_force)">
-    <!-- Joint definition for attaching the pole to the base of the quadcopter -->
+    
+    <!-- ========== MAIN POLE (vertical from robot center) ========== -->
+    
     <joint name="$(arg namespace)/pole_base_joint" type="fixed">
       <parent link="$(arg namespace)/base_link"/>
       <child link="$(arg namespace)/pole_base"/>
-      <origin xyz="${pole_length/2} 0 ${pole_mount_height}" rpy="0 1.57 0"/>
+      <origin xyz="0 0 ${pole_mount_height}" rpy="0 0 0"/>
     </joint>
 
-    <!-- Link definition for the pole -->
     <link name="$(arg namespace)/pole_base">
       <visual>
-
         <xacro:if value="$(arg x_axis)">
-          <origin xyz="0 0 0" rpy="0 0.0 0"/>
+          <origin xyz="${pole_length/2} 0 0" rpy="0 1.57 0"/>
         </xacro:if>
         <xacro:if value="$(arg z_axis)">
-          <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+          <origin xyz="0 0 -${pole_length/2}" rpy="0 0 0"/>
         </xacro:if>
         <geometry>
           <cylinder length="${pole_length}" radius="${pole_radius}" />
@@ -216,10 +224,10 @@
 
       <collision>
         <xacro:if value="$(arg x_axis)">
-          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <origin xyz="${pole_length/2} 0 0" rpy="0 1.57 0"/>
         </xacro:if>
         <xacro:if value="$(arg z_axis)">
-          <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+          <origin xyz="0 0 -${pole_length/2}" rpy="0 0 0"/>
         </xacro:if>
         <geometry>
           <cylinder length="${pole_length}" radius="${pole_radius}" />
@@ -228,12 +236,11 @@
 
       <inertial>
         <xacro:if value="$(arg x_axis)">
-          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <origin xyz="${pole_length/2} 0 0" rpy="0 1.57 0"/>
         </xacro:if>
         <xacro:if value="$(arg z_axis)">
-          <origin xyz="${-pole_length/2} 0 ${-pole_length/2}" rpy="0 1.57 0"/>
+          <origin xyz="0 0 -${pole_length/2}" rpy="0 0 0"/>
         </xacro:if>
-
         <mass value="${pole_mass}" />
         <inertia 
           ixx="${(1/12) * pole_mass * (3*pole_radius*pole_radius + pole_length*pole_length)}" 
@@ -245,205 +252,341 @@
       </inertial>
     </link>
 
-    <xacro:if value="$(arg box_tip)">
-      <link name="pole_tip">
-        <visual>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>
-            <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-          </geometry>
-          <material name="red">
-            <color rgba="1 0 0 1"/> 
-          </material>
-        </visual>
+    <!-- ========== BRANCH JUNCTION LINK ========== -->
+    <!-- T-junction where main pole branches to left and right -->
+    
+    <link name="$(arg namespace)/branch_junction">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="0.015"/>
+        </geometry>
+        <material name="yellow">
+          <color rgba="1 1 0 1"/>
+        </material>
+      </visual>
 
-        <collision>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>
-            <box size="${sens_len_x} ${sens_len_y} ${sens_len_z}"/> 
-          </geometry>
-        </collision>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="0.015"/>
+        </geometry>
+      </collision>
 
-        <inertial>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <mass value="${sensor_mass}"/> 
-          <inertia ixx="${(1/12) * sensor_mass * (sens_len_y*sens_len_y + sens_len_z*sens_len_z)}" 
-                  ixy="0.0" 
-                  ixz="0.0"
-                  iyy="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_z*sens_len_z)}" 
-                  iyz="0.0"
-                  izz="${(1/12) * sensor_mass * (sens_len_x*sens_len_x + sens_len_y*sens_len_y)}" />
-        </inertial>
-      </link>
-    </xacro:if>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.001"/>
+        <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="1e-6" iyz="0.0" izz="1e-6"/>
+      </inertial>
+    </link>
 
-    <xacro:if value="$(arg cylinder_tip)">
-      <link name="pole_tip">
-
-      <!-- First cylinder-->
-        <visual>
-          <origin xyz="0 0 0" rpy="0.0  -0.78539816339 0"/>
-          <geometry>
-            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
-          </geometry>
-          <material name="red">
-            <color rgba="1 0 0 1"/> 
-          </material>
-        </visual>
-
-        <collision>
-          <origin xyz="0 0 0" rpy="0.0  -0.78539816339 0"/>
-          <geometry>
-            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
-          </geometry>
-        </collision>
-
-        <inertial>
-          <origin xyz="0 0 0" rpy="0.0  -0.78539816339 0"/>
-          <mass value="${sensor_mass}"/> 
-          <inertia ixx="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
-                  ixy="0.0" 
-                  ixz="0.0"
-                  iyy="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
-                  iyz="0.0"
-                  izz="${(1/2) * sensor_mass * (sens_cylinder_radius*sens_cylinder_radius)}" />
-        </inertial>
-
-       <!-- Second cylinder-->
-        <visual>
-          <origin xyz="0 0 0" rpy="0.78539816339  0.78539816339 0"/>
-          <geometry>
-            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
-          </geometry>
-          <material name="red">
-            <color rgba="1 0 0 1"/> 
-          </material>
-        </visual>
-
-        <collision>
-          <origin xyz="0 0 0" rpy="0.78539816339  0.78539816339 0"/>
-          <geometry>
-            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
-          </geometry>
-        </collision>
-
-        <inertial>
-          <origin xyz="0 0 0" rpy="0.78539816339  0.78539816339 0"/>
-          <mass value="${sensor_mass}"/> 
-          <inertia ixx="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
-                  ixy="0.0" 
-                  ixz="0.0"
-                  iyy="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
-                  iyz="0.0"
-                  izz="${(1/2) * sensor_mass * (sens_cylinder_radius*sens_cylinder_radius)}" />
-        </inertial>
-
-      <!-- Third cylinder-->
-        <visual>
-          <origin xyz="0 0 0" rpy="2.35619449019   0.78539816339 0"/>
-          <geometry>
-            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
-          </geometry>
-          <material name="red">
-            <color rgba="1 0 0 1"/> 
-          </material>
-        </visual>
-
-        <collision>
-          <origin xyz="0 0 0" rpy="02.35619449019   0.78539816339 0"/>
-          <geometry>
-            <cylinder radius="${sens_cylinder_radius}" length="${sens_cylinder_height}"/> 
-          </geometry>
-        </collision>
-
-        <inertial>
-          <origin xyz="0 0 0" rpy="02.35619449019   0.78539816339 0"/>
-          <mass value="${sensor_mass}"/> 
-          <inertia ixx="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
-                  ixy="0.0" 
-                  ixz="0.0"
-                  iyy="${(1/12) * sensor_mass * (3*sens_cylinder_radius*sens_cylinder_radius + sens_cylinder_height*sens_cylinder_height)}" 
-                  iyz="0.0"
-                  izz="${(1/2) * sensor_mass * (sens_cylinder_radius*sens_cylinder_radius)}" />
-        </inertial>
-      </link>
-    </xacro:if>
-
-    <xacro:if value="$(arg sphere_tip)">
-      <link name="pole_tip">
-        <visual>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>
-            <sphere radius="${sens_radius}"/> 
-          </geometry>
-          <material name="red">
-            <color rgba="1 0 0 1"/> 
-          </material>
-        </visual>
-
-        <collision>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>
-            <sphere radius="${sens_radius}"/> 
-          </geometry>
-        </collision>
-
-        <inertial>
-          <origin xyz="0 0 0" rpy="0 0 0"/>
-          <mass value="${sensor_mass}"/> 
-          <inertia ixx="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
-                  ixy="0.0" 
-                  ixz="0.0"
-                  iyy="${(2/5) * sensor_mass * sens_radius * sens_radius}" 
-                  iyz="0.0"
-                  izz="${(2/5) * sensor_mass * sens_radius * sens_radius}" />
-        </inertial>
-      </link>
-    </xacro:if>
-
-    <!-- Joint for attaching the force sensor to the tip of the pole -->
-    <joint name="$(arg namespace)/pole_tip_joint" type="revolute">
+    <joint name="$(arg namespace)/junction_joint" type="fixed">
       <parent link="$(arg namespace)/pole_base"/>
-      <child link="pole_tip"/>
-
+      <child link="$(arg namespace)/branch_junction"/>
       <xacro:if value="$(arg x_axis)">
-          <origin xyz="0 0 ${pole_length/2}" rpy="0 0 0"/>
-
-          <limit upper="0.40" lower="0.40" effort="10000000" velocity="0"/>
-      <axis xyz="0 1 0" />
-
+        <origin xyz="${pole_length} 0 0" rpy="0 0 0"/>
       </xacro:if>
       <xacro:if value="$(arg z_axis)">
-          <origin xyz="-${pole_length} 0 -${pole_length/2}" rpy="0 1.57 0"/>
-
-          <limit upper="0.0" lower="0.0" effort="10000000" velocity="0"/>
-      <axis xyz="0 0 1" />
-
+        <origin xyz="0 0 -${pole_length}" rpy="0 0 0"/>
       </xacro:if>
-      
     </joint>
 
-    <!-- Enable the Joint Feedback -->
-    <gazebo reference="$(arg namespace)/pole_tip_joint">
-      <stopCfm>0.08</stopCfm>
-      <stopErp>0.2</stopErp>
-      <implicitSpringDamper>true</implicitSpringDamper>
+    <!-- ========== LEFT BRANCH POLE ========== -->
+
+    <link name="$(arg namespace)/branch_pole_left">
+      <visual>
+        <origin xyz="0 -${branch_pole_length/2} 0" rpy="1.57 0 0"/>
+        <geometry>
+          <cylinder length="${branch_pole_length}" radius="${pole_radius}" />
+        </geometry>
+        <material name="cyan">
+          <color rgba="0 1 1 1"/>
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 -${branch_pole_length/2} 0" rpy="1.57 0 0"/>
+        <geometry>
+          <cylinder length="${branch_pole_length}" radius="${pole_radius}" />
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 -${branch_pole_length/2} 0" rpy="1.57 0 0"/>
+        <mass value="${branch_mass}" />
+        <inertia 
+          ixx="${(1/12) * branch_mass * (3*pole_radius*pole_radius + branch_pole_length*branch_pole_length)}" 
+          ixy="0.0" 
+          ixz="0.0"
+          iyy="${(1/12) * branch_mass * (3*pole_radius*pole_radius + branch_pole_length*branch_pole_length)}" 
+          iyz="0.0" 
+          izz="${(1/2) * branch_mass * (pole_radius*pole_radius)}" />
+      </inertial>
+    </link>
+
+    <joint name="$(arg namespace)/branch_joint_left" type="fixed">
+      <parent link="$(arg namespace)/branch_junction"/>
+      <child link="$(arg namespace)/branch_pole_left"/>
+      <origin xyz="0 ${branch_offset} 0" rpy="0 0 0"/>
+    </joint>
+
+    <!-- ========== LEFT SOFT GUMMY SPHERE ========== -->
+
+    <link name="$(arg namespace)/gummy_sphere_left">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="${gummy_sphere_radius}"/>
+        </geometry>
+        <material name="gummy_pink">
+          <color rgba="0.95 0.6 0.7 1"/>
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="${gummy_sphere_radius}"/>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${gummy_sphere_mass}"/>
+        <inertia 
+          ixx="${(2/5) * gummy_sphere_mass * gummy_sphere_radius * gummy_sphere_radius}" 
+          ixy="0.0" 
+          ixz="0.0"
+          iyy="${(2/5) * gummy_sphere_mass * gummy_sphere_radius * gummy_sphere_radius}" 
+          iyz="0.0"
+          izz="${(2/5) * gummy_sphere_mass * gummy_sphere_radius * gummy_sphere_radius}" />
+      </inertial>
+    </link>
+
+    <!-- LEFT joint: Y-axis rotation (perpendicular to left branch direction) -->
+    <joint name="$(arg namespace)/pole_tip_joint_left" type="revolute">
+      <parent link="$(arg namespace)/branch_pole_left"/>
+      <child link="$(arg namespace)/gummy_sphere_left"/>
+      <origin xyz="0 -${branch_pole_length} 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0" />
+      <!-- Limited range - acts as compliance and force measurement point -->
+      <limit lower="-0.1" upper="0.1" effort="100" velocity="0.0"/>
+      <dynamics damping="1.0" friction="0.1"/>
+    </joint>
+
+    <!-- Gazebo plugin configuration for LEFT joint -->
+    <gazebo reference="$(arg namespace)/pole_tip_joint_left">
       <provideFeedback>true</provideFeedback>
+      <implicitSpringDamper>true</implicitSpringDamper>
+      <stopCfm>${gummy_contact_cfm}</stopCfm>
+      <stopErp>${gummy_contact_erp}</stopErp>
     </gazebo>
 
-    <!-- The ft_sensor plugin -->
+    <!-- LEFT Force/Torque Sensor Plugin -->
+    <!-- Publishes to: /[namespace]/force_sensor_left/sensor_readings -->
     <gazebo>
-      <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
+      <plugin name="ft_sensor_left" filename="libgazebo_ros_ft_sensor.so">
         <updateRate>1000</updateRate>
-        <topicName>$(arg namespace)/force_sensor/sensor_readings</topicName>
-        <jointName>$(arg namespace)/pole_tip_joint</jointName>
+        <topicName>$(arg namespace)/force_sensor_left/sensor_readings</topicName>
+        <jointName>$(arg namespace)/pole_tip_joint_left</jointName>
         <noise>
-            <type>gaussian</type>
-            <mean>0.0</mean>
-            <stddev>0.0001</stddev> 
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.0</stddev>
         </noise>
       </plugin>
     </gazebo>
 
+    <!-- Gazebo material and contact properties for LEFT sphere -->
+    <gazebo reference="$(arg namespace)/gummy_sphere_left">
+      <material>
+        <ambient>0.95 0.6 0.7 1</ambient>
+        <diffuse>0.95 0.6 0.7 1</diffuse>
+        <specular>0.1 0.1 0.1 1</specular>
+        <emissive>0 0 0 1</emissive>
+      </material>
+      <surface>
+        <friction>
+          <ode>
+            <mu>${gummy_friction}</mu>
+            <mu2>${gummy_friction}</mu2>
+            <slip1>0.3</slip1>
+            <slip2>0.3</slip2>
+          </ode>
+        </friction>
+        <bounce>
+          <restitution_coefficient>${gummy_restitution}</restitution_coefficient>
+          <threshold>0.0</threshold>
+        </bounce>
+        <contact>
+          <ode>
+            <soft_cfm>${gummy_contact_cfm}</soft_cfm>
+            <soft_erp>${gummy_contact_erp}</soft_erp>
+            <kp>10000</kp>
+            <kd>100</kd>
+            <max_vel>0.1</max_vel>
+            <min_depth>0.0001</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
+
+    <!-- ========== RIGHT BRANCH POLE ========== -->
+
+    <link name="$(arg namespace)/branch_pole_right">
+      <visual>
+        <origin xyz="0 ${branch_pole_length/2} 0" rpy="1.57 0 0"/>
+        <geometry>
+          <cylinder length="${branch_pole_length}" radius="${pole_radius}" />
+        </geometry>
+        <material name="magenta">
+          <color rgba="1 0 1 1"/>
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 ${branch_pole_length/2} 0" rpy="1.57 0 0"/>
+        <geometry>
+          <cylinder length="${branch_pole_length}" radius="${pole_radius}" />
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 ${branch_pole_length/2} 0" rpy="1.57 0 0"/>
+        <mass value="${branch_mass}" />
+        <inertia 
+          ixx="${(1/12) * branch_mass * (3*pole_radius*pole_radius + branch_pole_length*branch_pole_length)}" 
+          ixy="0.0" 
+          ixz="0.0"
+          iyy="${(1/12) * branch_mass * (3*pole_radius*pole_radius + branch_pole_length*branch_pole_length)}" 
+          iyz="0.0" 
+          izz="${(1/2) * branch_mass * (pole_radius*pole_radius)}" />
+      </inertial>
+    </link>
+
+    <joint name="$(arg namespace)/branch_joint_right" type="fixed">
+      <parent link="$(arg namespace)/branch_junction"/>
+      <child link="$(arg namespace)/branch_pole_right"/>
+      <origin xyz="0 -${branch_offset} 0" rpy="0 0 0"/>
+    </joint>
+
+    <!-- ========== RIGHT SOFT GUMMY SPHERE ========== -->
+
+    <link name="$(arg namespace)/gummy_sphere_right">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="${gummy_sphere_radius}"/>
+        </geometry>
+        <material name="gummy_pink">
+          <color rgba="0.95 0.6 0.7 1"/>
+        </material>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <sphere radius="${gummy_sphere_radius}"/>
+        </geometry>
+      </collision>
+
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${gummy_sphere_mass}"/>
+        <inertia 
+          ixx="${(2/5) * gummy_sphere_mass * gummy_sphere_radius * gummy_sphere_radius}" 
+          ixy="0.0" 
+          ixz="0.0"
+          iyy="${(2/5) * gummy_sphere_mass * gummy_sphere_radius * gummy_sphere_radius}" 
+          iyz="0.0"
+          izz="${(2/5) * gummy_sphere_mass * gummy_sphere_radius * gummy_sphere_radius}" />
+      </inertial>
+    </link>
+
+    <!-- RIGHT joint: Y-axis rotation (SAME axis as LEFT for consistency) -->
+    <!-- CRITICAL: This ensures BOTH sensors measure forces in the same direction -->
+    <!-- The Z-axis approach caused the right sensor to measure opposite -->
+    <joint name="$(arg namespace)/pole_tip_joint_right" type="revolute">
+      <parent link="$(arg namespace)/branch_pole_right"/>
+      <child link="$(arg namespace)/gummy_sphere_right"/>
+      <origin xyz="0 ${branch_pole_length} 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0" />
+      <limit lower="-0.1" upper="0.1" effort="100" velocity="0.0"/>
+      <dynamics damping="1.0" friction="0.1"/>
+    </joint>
+
+    <!-- Gazebo plugin configuration for RIGHT joint -->
+    <gazebo reference="$(arg namespace)/pole_tip_joint_right">
+      <provideFeedback>true</provideFeedback>
+      <implicitSpringDamper>true</implicitSpringDamper>
+      <stopCfm>${gummy_contact_cfm}</stopCfm>
+      <stopErp>${gummy_contact_erp}</stopErp>
+    </gazebo>
+
+    <!-- RIGHT Force/Torque Sensor Plugin -->
+    <!-- Publishes to: /[namespace]/force_sensor_right/sensor_readings -->
+    <gazebo>
+      <plugin name="ft_sensor_right" filename="libgazebo_ros_ft_sensor.so">
+        <updateRate>1000</updateRate>
+        <topicName>$(arg namespace)/force_sensor_right/sensor_readings</topicName>
+        <jointName>$(arg namespace)/pole_tip_joint_right</jointName>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.0</stddev>
+        </noise>
+      </plugin>
+    </gazebo>
+
+    <!-- Gazebo material and contact properties for RIGHT sphere -->
+    <gazebo reference="$(arg namespace)/gummy_sphere_right">
+      <material>
+        <ambient>0.95 0.6 0.7 1</ambient>
+        <diffuse>0.95 0.6 0.7 1</diffuse>
+        <specular>0.1 0.1 0.1 1</specular>
+        <emissive>0 0 0 1</emissive>
+      </material>
+      <surface>
+        <friction>
+          <ode>
+            <mu>${gummy_friction}</mu>
+            <mu2>${gummy_friction}</mu2>
+            <slip1>0.3</slip1>
+            <slip2>0.3</slip2>
+          </ode>
+        </friction>
+        <bounce>
+          <restitution_coefficient>${gummy_restitution}</restitution_coefficient>
+          <threshold>0.0</threshold>
+        </bounce>
+        <contact>
+          <ode>
+            <soft_cfm>${gummy_contact_cfm}</soft_cfm>
+            <soft_erp>${gummy_contact_erp}</soft_erp>
+            <kp>10000</kp>
+            <kd>100</kd>
+            <max_vel>0.1</max_vel>
+            <min_depth>0.0001</min_depth>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
+
+    <!-- ========== BACKWARD COMPATIBILITY DUMMY LINK ========== -->
+    
+    <link name="pole_tip">
+      <inertial>
+        <mass value="0.0001"/>
+        <inertia ixx="1e-8" ixy="0.0" ixz="0.0" iyy="1e-8" iyz="0.0" izz="1e-8"/>
+      </inertial>
+    </link>
+
+    <joint name="pole_tip_dummy_joint" type="fixed">
+      <parent link="$(arg namespace)/gummy_sphere_left"/>
+      <child link="pole_tip"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
   </xacro:if>
+
 </robot>
