@@ -733,7 +733,7 @@
             <visual>
               <origin xyz="0 0 0" rpy="0 1.57 0"/>
               <geometry>
-                <mesh filename="package://ardupilot_gazebo/models/util/asus_xtion_pro_camera.dae" scale="1 1 1" />
+                <mesh filename="package://ardupilot_gazebo/models/util/SimpleCamera.obj" scale="1 1 1" />
               </geometry>
             </visual>
         </link>
@@ -779,56 +779,49 @@
 
         <link name="${namespace}/camera_optical_frame">
         </link>
-        
-        <gazebo reference="${namespace}/gimbal_link_4">
-            <sensor type="depth" name="camera">
-              <update_rate>50.0</update_rate>
-              
-              <camera name="head">
-                <horizontal_fov>1.5707963268</horizontal_fov>
-                <image>
-                  <width>1280</width>
-                  <height>720</height>
-                  <format>R8G8B8</format>
-                </image>
-                <clip>
-                  <near>0.02</near>
-                  <far>300</far>
-                </clip>
-                <noise>
-                  <type>gaussian</type>
-                  <mean>0.0</mean>
-                  <stddev>0.007</stddev>
-                </noise>
-              </camera>
 
-              <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
-                <baseline>0.2</baseline>
-                <alwaysOn>true</alwaysOn>
-                <!-- Keep this zero, update_rate in the parent <sensor> tag
-                  will control the frame rate. -->
-                <updateRate>0.0</updateRate>
-                <cameraName>${namespace}/camera_ir_gimbal</cameraName>
-                <imageTopicName>/${namespace}/camera_gimbal/color/image_raw</imageTopicName>
-                <cameraInfoTopicName>/${namespace}/camera_gimbal/color/camera_info</cameraInfoTopicName>
-                <depthImageTopicName>/${namespace}/camera_gimbal/depth/image_raw</depthImageTopicName>
-                <depthImageCameraInfoTopicName>/${namespace}/camera_gimbal/depth/camera_info</depthImageCameraInfoTopicName>
-                <pointCloudTopicName>/${namespace}/camera_gimbal/depth/points</pointCloudTopicName>
-                <frameName>camera_gimbal_optical_frame</frameName>
-                <pointCloudCutoff>2.0</pointCloudCutoff>
-                <pointCloudCutoffMax>15.0</pointCloudCutoffMax>
-                <distortionK1>0</distortionK1>
-                <distortionK2>0</distortionK2>
-                <distortionK3>0</distortionK3>
-                <distortionT1>0</distortionT1>
-                <distortionT2>0</distortionT2>
-                <CxPrime>0</CxPrime>
-                <Cx>0</Cx>
-                <Cy>0</Cy>
-                <focalLength>0</focalLength>
-                <hackBaseline>0</hackBaseline>
-              </plugin>
-            </sensor>
+        <gazebo reference="${namespace}/gimbal_link_4">
+          <sensor type="camera" name="${namespace}_camera_gimbal">
+            <update_rate>30.0</update_rate>
+            <camera name="head">
+              <!-- This fov is for 50mm lens we use on Sony -->
+              <horizontal_fov>0.604</horizontal_fov>
+              <image>
+                <width>1280</width>
+                <height>720</height>
+                <format>R8G8B8</format>
+              </image>
+              <clip>
+                <near>0.02</near>
+                <far>300</far>
+              </clip>
+              <noise>
+                <type>gaussian</type>
+                <mean>0.0</mean>
+                <stddev>0.007</stddev>
+              </noise>
+            </camera>
+
+            <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
+              <robotNamespace>${namespace}</robotNamespace>
+              <alwaysOn>true</alwaysOn>
+              <updateRate>0.0</updateRate>
+
+              <cameraName>camera_gimbal</cameraName>
+
+              <imageTopicName>/${namespace}/camera_gimbal/color/image_raw</imageTopicName>
+              <cameraInfoTopicName>/${namespace}/camera_gimbal/color/camera_info</cameraInfoTopicName>
+
+              <frameName>camera_gimbal_optical_frame</frameName>
+
+              <distortionK1>0</distortionK1>
+              <distortionK2>0</distortionK2>
+              <distortionK3>0</distortionK3>
+              <distortionT1>0</distortionT1>
+              <distortionT2>0</distortionT2>
+            </plugin>
+
+          </sensor>
         </gazebo>
 
         <gazebo>
