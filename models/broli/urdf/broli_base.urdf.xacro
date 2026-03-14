@@ -17,7 +17,7 @@
   <xacro:property name="arm_length" value="0.52" /> <!-- [m] -->
   <xacro:property name="rotor_x_offset" value="${arm_length*cos45}" /> <!-- [m] -->
   <xacro:property name="rotor_y_offset" value="${arm_length*sin45}" /> <!-- [m] -->
-  <xacro:property name="rotor_offset_top" value="0.115" /> <!-- [m] -->
+  <xacro:property name="rotor_offset_top" value="0.065" /> <!-- [m] -->
 
   <!-- Rotor constants -->
   <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->
@@ -75,9 +75,9 @@
     motor_number="1"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    color="Red"
+    color="FlatBlack"
     prop_scale="${prop_scale}">
-    <origin xyz="${rotor_x_offset} ${rotor_y_offset} ${rotor_offset_top}" rpy="0 0 0" />
+    <origin xyz="0.385 0.465 ${rotor_offset_top}" rpy="0 0 0" />
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -96,9 +96,9 @@
     motor_number="0"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    color="Blue"
+    color="FlatBlack"
     prop_scale="${prop_scale}">
-    <origin xyz="${rotor_x_offset} -${rotor_y_offset} ${rotor_offset_top}" rpy="0 0 0" />
+    <origin xyz="0.385 -0.465 ${rotor_offset_top}" rpy="0 0 0" />
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -117,9 +117,9 @@
     motor_number="2"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    color="Blue"
+    color="FlatBlack"
     prop_scale="${prop_scale}">
-    <origin xyz="-${rotor_x_offset} ${rotor_y_offset} ${rotor_offset_top}" rpy="0 0 0" />
+    <origin xyz="-0.385 0.465 ${rotor_offset_top-0.025}" rpy="0 0 0" />
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
@@ -138,9 +138,9 @@
     motor_number="3"
     rotor_drag_coefficient="${rotor_drag_coefficient}"
     rolling_moment_coefficient="${rolling_moment_coefficient}"
-    color="Red"
+    color="FlatBlack"
     prop_scale="${prop_scale}">
-    <origin xyz="-${rotor_x_offset} -${rotor_y_offset} ${rotor_offset_top}" rpy="0 0 0" />
+    <origin xyz="-0.385 -0.465 ${rotor_offset_top-0.025}" rpy="0 0 0" />
     <xacro:insert_block name="rotor_inertia" />
   </xacro:vertical_rotor>
 
