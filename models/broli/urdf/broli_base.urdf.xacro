@@ -8,7 +8,7 @@
 
   <!-- Body Properties -->
   <xacro:property name="rotor_velocity_slowdown_sim" value="15" />
-  <xacro:property name="mesh_file" value="ardupilot_gazebo/models/broli/meshes/BroliV1.obj" />
+  <xacro:property name="mesh_file" value="ardupilot_gazebo/models/broli/meshes/BroliSimple.obj" />
   <xacro:property name="mesh_scale" value="1.0" />
   <xacro:property name="prop_scale" value="0.003" />
   <xacro:property name="mass" value="9" />  <!-- [kg] -->
