@@ -16,6 +16,8 @@
 
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
+  <!-- Fpv camera params -->
+  <arg name="enable_fpv_camera"   default="false"/>
 
   <!-- Velodyne properties - requires velodyne_simulator -->
   <arg name="enable_velodyne"           default="false" />
@@ -75,6 +77,8 @@
 
     <!-- Camera properties -->
     <arg name="camera_pose"         value="$(arg camera_pose)"/>
+    <!-- Fpv camera params -->
+    <arg name="enable_fpv_camera"   value="$(arg enable_fpv_camera)"/>
 
     <!-- Velodyne properties - requires velodyne_simulator -->
     <arg name="enable_velodyne"           value="$(arg enable_velodyne)" />

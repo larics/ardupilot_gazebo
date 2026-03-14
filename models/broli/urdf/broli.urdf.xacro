@@ -18,15 +18,15 @@
   <xacro:property name="max_range" value="$(arg max_range)"/>
   <xacro:property name="laser_count" value="$(arg laser_count)"/>
   <xacro:property name="camera_pose" value="$(arg camera_pose)"/>
-
-  <xacro:property name="enable_wind"      value="$(arg enable_wind)" />
-  <xacro:property name="wind_force"       value="$(arg wind_force)" />
-  <xacro:property name="wind_force_mean"  value="$(arg wind_force_mean)" />
-  <xacro:property name="wind_start"       value="$(arg wind_start)" />
-  <xacro:property name="wind_duration"    value="$(arg wind_duration)" />
-  <xacro:property name="wind_direction_x" value="$(arg wind_direction_x)" />
-  <xacro:property name="wind_direction_y" value="$(arg wind_direction_y)" />
-  <xacro:property name="wind_direction_z" value="$(arg wind_direction_z)" />
+  <xacro:property name="enable_fpv_camera"  value="$(arg enable_fpv_camera)"/>
+  <xacro:property name="enable_wind"        value="$(arg enable_wind)" />
+  <xacro:property name="wind_force"         value="$(arg wind_force)" />
+  <xacro:property name="wind_force_mean"    value="$(arg wind_force_mean)" />
+  <xacro:property name="wind_start"         value="$(arg wind_start)" />
+  <xacro:property name="wind_duration"      value="$(arg wind_duration)" />
+  <xacro:property name="wind_direction_x"   value="$(arg wind_direction_x)" />
+  <xacro:property name="wind_direction_y"   value="$(arg wind_direction_y)" />
+  <xacro:property name="wind_direction_z"   value="$(arg wind_direction_z)" />
 
   <!-- Collision bitmask - By default collides with everything -->
   <xacro:arg name="collision_bitmask" default="-1" />
@@ -284,6 +284,19 @@
       </xacro:gimbal_yrp_macro>
     </xacro:if>
     
+  </xacro:if>
+
+  <!-- Fixed FPV camera -->
+  <xacro:if value="${enable_fpv_camera}">
+    <xacro:property name="fpv_camera_origin">
+      <origin xyz="0.5 0.01 0.0" rpy="0 0 0"/>
+    </xacro:property>
+    <xacro:fpv_camera_macro
+        namespace="$(arg namespace)"
+        parent="${namespace}/base_link">
+
+      <xacro:insert_block name="fpv_camera_origin"/>
+    </xacro:fpv_camera_macro>
   </xacro:if>
 
 </robot>

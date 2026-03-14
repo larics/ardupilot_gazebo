@@ -935,4 +935,99 @@
 
   </xacro:macro>
 
+  <!-- Simple fixed FPV camera -->
+  <xacro:macro name="fpv_camera_macro" params="namespace parent *origin">
+
+    <joint name="${namespace}/fpv_camera_joint" type="fixed">
+      <xacro:insert_block name="origin"/>
+      <parent link="${parent}"/>
+      <child link="${namespace}/fpv_camera_link"/>
+    </joint>
+
+    <gazebo reference="${namespace}/fpv_camera_joint">
+      <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+
+    <link name="${namespace}/fpv_camera_link">
+      <inertial>
+        <mass value="0.0001"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.0001" ixy="0" ixz="0"
+                iyy="0.0001" iyz="0"
+                izz="0.0001"/>
+      </inertial>
+
+      <!--visual>
+        <origin xyz="0 0 0" rpy="0 1.57 0"/>
+        <geometry>
+          <mesh filename="package://ardupilot_gazebo/models/util/SimpleCamera.obj"
+                scale="1 1 1"/>
+        </geometry>
+      </visual-->
+    </link>
+
+    <!-- optical frame -->
+    <joint name="${namespace}/fpv_camera_optical_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+      <parent link="${namespace}/fpv_camera_link"/>
+      <child link="${namespace}/fpv_camera_optical_frame"/>
+    </joint>
+
+    <gazebo reference="${namespace}/fpv_camera_optical_joint">
+      <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+
+    <link name="${namespace}/fpv_camera_optical_frame"/>
+
+    <gazebo reference="${namespace}/fpv_camera_link">
+      <sensor type="camera" name="${namespace}_fpv_camera">
+
+        <update_rate>30</update_rate>
+
+        <camera name="fpv">
+          <horizontal_fov>1.5707</horizontal_fov>
+
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>R8G8B8</format>
+          </image>
+
+          <clip>
+            <near>0.02</near>
+            <far>300</far>
+          </clip>
+
+          <noise>
+            <type>gaussian</type>
+            <mean>0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+
+        </camera>
+
+        <plugin name="camera_plugin" filename="libgazebo_ros_camera.so">
+          <robotNamespace>${namespace}</robotNamespace>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>0</updateRate>
+
+          <cameraName>fpv_camera</cameraName>
+
+          <imageTopicName>/${namespace}/fpv_camera/image_raw</imageTopicName>
+          <cameraInfoTopicName>/${namespace}/fpv_camera/camera_info</cameraInfoTopicName>
+
+          <frameName>${namespace}/fpv_camera_optical_frame</frameName>
+
+          <distortionK1>0</distortionK1>
+          <distortionK2>0</distortionK2>
+          <distortionK3>0</distortionK3>
+          <distortionT1>0</distortionT1>
+          <distortionT2>0</distortionT2>
+        </plugin>
+
+      </sensor>
+    </gazebo>
+
+  </xacro:macro>
+
 </robot>

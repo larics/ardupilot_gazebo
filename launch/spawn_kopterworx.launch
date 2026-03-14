@@ -16,6 +16,7 @@
 
   <!-- Camera properties -->
   <arg name="camera_pose"         default="front_facing_camera"/>
+  <arg name="enable_fpv_camera"   default="false"/>
 
   <!-- Velodyne properties - requires velodyne_simulator -->
   <arg name="enable_velodyne"           default="false" />
@@ -64,6 +65,7 @@
     enable_tilt_rotors:=$(arg enable_tilt_rotors)
     enable_simple_manipulator:=$(arg enable_simple_manipulator)
     camera_pose:=$(arg camera_pose)
+    enable_fpv_camera:=$(arg enable_fpv_camera)
     enable_wind:=$(arg enable_wind)
     wind_force:=$(arg wind_force)
     wind_force_mean:=$(arg wind_force_mean)
