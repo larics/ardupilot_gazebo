@@ -234,14 +234,16 @@
   </link>
 
   <!-- Add Gazebo friction properties -->
-  <!--gazebo reference="pole_tip">
-    <mu1>0.9</mu1>     
-    <mu2>0.9</mu2>     
-    <kp>10</kp>    
-    <kd>500</kd>    
-    <fdir1>1 0 0</fdir1>
-  </gazebo-->
-
+  <gazebo reference="pole_tip">
+    <mu1>0.9</mu1>      
+    <mu2>0.9</mu2>      
+    <kp>1000.0</kp>    
+    <kd>100.0</kd>     
+    <soft_cfm>0.05</soft_cfm>
+    <soft_erp>0.2</soft_erp>
+    <max_vel>0.01</max_vel>
+    <min_depth>0.003</min_depth>
+  </gazebo>
 
     <!-- Joint for attaching the force sensor to the tip of the pole -->
     <joint name="$(arg namespace)/pole_tip_joint" type="revolute">

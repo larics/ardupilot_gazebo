@@ -2,7 +2,7 @@
 
   <arg name="name"                  default="kopterworx"/>
   <arg name="id"                    default="1"/>
-  <arg name="parm_file"             default="$(find ardupilot_gazebo)/config/kopterworx_v432.params"/>
+  <arg name="parm_file"             default="$(find ardupilot_gazebo)/config/crow_params_tuned.params"/>
   <arg name="enable_console"        default="true"/>
   <arg name="enable_map"            default="false"/>
   <arg name="streamrate"            default="50"/>

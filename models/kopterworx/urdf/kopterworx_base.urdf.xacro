@@ -59,12 +59,12 @@
 
   <!-- Contact/Material properties for gummy (soft, compliant) -->
   <xacro:property name="gummy_friction" value="0.4" /> <!-- Moderate friction for grip -->
-  <xacro:property name="gummy_restitution" value="0.05" /> <!-- Very low bounce (soft material) -->
+  <xacro:property name="gummy_restitution" value="0.0005" /> <!-- Very low bounce (soft material) -->
   
   <!-- Soft contact damping/stiffness (Gazebo ODE parameters) -->
   <!-- Low stiffness = more deformation, higher damping = dissipates energy -->
-  <xacro:property name="gummy_contact_cfm" value="0.001" /> <!-- Constraint force mixing - higher = softer -->
-  <xacro:property name="gummy_contact_erp" value="0.08" /> <!-- Error reduction parameter - lower = softer response -->
+  <xacro:property name="gummy_contact_cfm" value="0.05" /> <!-- Constraint force mixing - higher = softer -->
+  <xacro:property name="gummy_contact_erp" value="0.2" /> <!-- Error reduction parameter - lower = softer response -->
 
   <!-- Rotor constants -->
   <xacro:property name="mass_rotor" value="0.01" /> <!-- [kg] -->
@@ -371,7 +371,7 @@
       <axis xyz="0 1 0" />
       <!-- Limited range - acts as compliance and force measurement point -->
       <limit lower="-0.1" upper="0.1" effort="100" velocity="0.0"/>
-      <dynamics damping="1.0" friction="0.1"/>
+      <dynamics damping="80.0" friction="20.0"/>
     </joint>
 
     <!-- Gazebo plugin configuration for LEFT joint -->
@@ -416,16 +416,16 @@
         </friction>
         <bounce>
           <restitution_coefficient>${gummy_restitution}</restitution_coefficient>
-          <threshold>0.0</threshold>
+          <threshold>100000.0</threshold>
         </bounce>
         <contact>
           <ode>
+            <min_depth>0.45</min_depth>
+            <kp>50</kp>
+            <kd>2000</kd>
             <soft_cfm>${gummy_contact_cfm}</soft_cfm>
             <soft_erp>${gummy_contact_erp}</soft_erp>
-            <kp>10000</kp>
-            <kd>100</kd>
-            <max_vel>0.1</max_vel>
-            <min_depth>0.0001</min_depth>
+            <max_vel>0.0001</max_vel>
           </ode>
         </contact>
       </surface>
@@ -510,9 +510,9 @@
       <parent link="$(arg namespace)/branch_pole_right"/>
       <child link="$(arg namespace)/gummy_sphere_right"/>
       <origin xyz="0 ${branch_pole_length} 0" rpy="0 0 0"/>
-      <axis xyz="0 1 0" />
+      <axis xyz="0 -1 0" />
       <limit lower="-0.1" upper="0.1" effort="100" velocity="0.0"/>
-      <dynamics damping="1.0" friction="0.1"/>
+      <dynamics damping="80.0" friction="20.0"/>
     </joint>
 
     <!-- Gazebo plugin configuration for RIGHT joint -->
@@ -557,16 +557,16 @@
         </friction>
         <bounce>
           <restitution_coefficient>${gummy_restitution}</restitution_coefficient>
-          <threshold>0.0</threshold>
+          <threshold>100000.0</threshold>
         </bounce>
         <contact>
           <ode>
             <soft_cfm>${gummy_contact_cfm}</soft_cfm>
             <soft_erp>${gummy_contact_erp}</soft_erp>
-            <kp>10000</kp>
-            <kd>100</kd>
+            <kp>50</kp>
+            <kd>2000</kd>
             <max_vel>0.1</max_vel>
-            <min_depth>0.0001</min_depth>
+            <min_depth>0.45</min_depth>
           </ode>
         </contact>
       </surface>
