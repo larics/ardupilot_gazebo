@@ -8,6 +8,10 @@
   <arg name="enable_ground_truth" default="true"/>
   <arg name="model"               default="$(find ardupilot_gazebo)/models/kopterworx/urdf/kopterworx.urdf.xacro" />
   <arg name="world"               default="worlds/empty.world"/>
+  <!-- ODE solver iterations, set for any world before it runs (Gazebo starts paused until then);
+       0 keeps the world's own. With Gazebo's default of 50 the resting vehicle can jitter, which
+       the IMU reads as gyro bias. -->
+  <arg name="physics_iters"       default="200"/>
   <arg name="fdm_port_in"         default="9002"/>
   <arg name="fdm_port_out"        default="9003"/>
   <arg name="use_sim_time"        default="true"/>
@@ -51,7 +55,7 @@
 
   <!-- Spawn the world -->
   <include file="$(find ardupilot_gazebo)/launch/empty_world.launch">
-    <arg name="paused"          value="false" />
+    <arg name="paused"          value="$(eval arg('physics_iters') != 0)" />
     <arg name="use_sim_time"    value="$(arg use_sim_time)"/>
     <arg name="verbose"         value="true" />
     <arg name="world_name"      value="$(arg world)" />
@@ -59,6 +63,9 @@
     <arg name="remap_gazebo_tf" value="$(arg remap_gazebo_tf)"/>
     <arg name="debug"           value="false" />
   </include>
+
+  <node unless="$(eval arg('physics_iters') == 0)" name="set_physics_iters" pkg="ardupilot_gazebo"
+        type="set_physics_iters.sh" args="$(arg physics_iters)" output="screen"/>
 
   <include file="$(find ardupilot_gazebo)/launch/spawn_kopterworx.launch">
     <arg name="name"                value="$(arg name)"/>
